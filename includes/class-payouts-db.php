@@ -107,9 +107,9 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 * }
 	 * @return int|false Payout ID if successfully added, otherwise false.
 	 */
-	public function add( $data = array() ) {
+	public function add( $args = array() ) {
 
-		$args = wp_parse_args( $data, array(
+		$args = wp_parse_args( $args, array(
 			'affiliate_id'  => 0,
 			'referrals'     => array(),
 			'amount'        => 0,

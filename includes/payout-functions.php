@@ -32,8 +32,8 @@ function affwp_get_payout( $payout = 0 ) {
  *
  * @since 1.9
  *
- * @param array $data {
- *     Optional. Data for adding a new payout record. Default empty array.
+ * @param array $args {
+ *     Optional. Arguments for adding a new payout record. Default empty array.
  *
  *     @type int          $affiliate_id  Affiliate ID.
  *     @type int          $referral_id   Referral ID.
@@ -44,9 +44,9 @@ function affwp_get_payout( $payout = 0 ) {
  * }
  * @return int|false The ID for the newly-added payout, otherwise false.
  */
-function affwp_add_payout( $data = array() ) {
+function affwp_add_payout( $args = array() ) {
 
-	if ( empty( $data['referrals'] ) || empty( $data['affiliate_id'] ) ) {
+	if ( empty( $args['referrals'] ) || empty( $args['affiliate_id'] ) ) {
 		return false;
 	}
 
