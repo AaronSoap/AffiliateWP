@@ -218,7 +218,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		$affiliates = array();
 
 		foreach ( $referrals as $referral ) {
-			if ( ! empty( $status ) && $status !== $referral->status ) {
+			if ( ! $referral || ( ! empty( $status ) && $status !== $referral->status ) ) {
 				continue;
 			}
 

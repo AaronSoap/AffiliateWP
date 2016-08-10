@@ -527,4 +527,90 @@ class Payouts_DB_Tests extends AffiliateWP_UnitTestCase {
 
 		$this->assertSame( $three, $payouts[0] );
 	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_affiliate_ids_by_referrals()
+	 */
+	public function test_get_affiliate_ids_by_referrals_should_reject_invalid_referrals() {
+		$this->assertEmpty( affiliate_wp()->affiliates->payouts->get_affiliate_ids_by_referrals( range( 1, 5 ) ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_affiliate_ids_by_referrals()
+	 */
+	public function test_get_affiliate_ids_by_referrals_should_reject_non_paid_referrals_by_defualt() {
+		$affiliate_id = $this->affwp->affiliate->create();
+
+		$paid = (array) $this->affwp->referral->create( array(
+			'status'       => 'paid',
+			'affiliate_id' => $affiliate_id,
+		) );
+		$pending = $this->affwp->referral->create_many( 2, array(
+			'affiliate_id' => $affiliate_id
+		) );
+
+		$referrals = array_merge( $paid, $pending );
+		$results   = affiliate_wp()->affiliates->payouts->get_affiliate_ids_by_referrals( $referrals );
+
+		$this->assertSame( $paid, $results[ $affiliate_id ] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_affiliate_ids_by_referrals()
+	 */
+	public function test_get_affiliate_ids_by_referrals_should_only_accept_referrals_by_non_default_status() {
+		$affiliate_id = $this->affwp->affiliate->create();
+
+		$unpaid = (array) $this->affwp->referral->create( array(
+			'status'       => 'unpaid',
+			'affiliate_id' => $affiliate_id,
+		) );
+		$pending = (array) $this->affwp->referral->create( array(
+			'affiliate_id' => $affiliate_id
+		) );
+
+		$referrals = array_merge( $unpaid, $pending );
+		$results   = affiliate_wp()->affiliates->payouts->get_affiliate_ids_by_referrals( $referrals, 'unpaid' );
+
+		$this->assertNotSame( $pending, $results[ $affiliate_id ] );
+		$this->assertSame( $unpaid, $results[ $affiliate_id ] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payout_ids_by_affiliates()
+	 */
+	public function test_get_payout_ids_by_affiliates_should_return_an_empty_array_if_affiliates_is_empty() {
+		$this->assertEmpty( affiliate_wp()->affiliates->payouts->get_payout_ids_by_affiliates( array() ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payout_ids_by_affiliates()
+	 */
+	public function test_get_payout_ids_by_affiliates_should_retrieve_payout_ids_for_all_given_referrals() {
+		$affiliate_id = $this->affwp->affiliate->create();
+
+		$payouts1 = (array) $this->affwp->payout->create( array(
+			'affiliate_id' => $affiliate_id,
+			'referrals' => $referrals1 = $this->affwp->referral->create_many( 2, array(
+				'affiliate_id' => $affiliate_id,
+				'status'       => 'paid'
+			) )
+		) );
+
+		$payouts2 = (array) $this->affwp->payout->create( array(
+			'affiliate_id' => $affiliate_id = $this->affwp->affiliate->create(),
+			'referrals' => $referrals2 = $this->affwp->referral->create_many( 2, array(
+				'affiliate_id' => $affiliate_id,
+				'status'       => 'paid'
+			) )
+		) );
+
+		$payouts   = array_merge( $payouts1, $payouts2 );
+		$referrals = array_merge( $referrals1, $referrals2 );
+
+		$affiliates = affiliate_wp()->affiliates->payouts->get_affiliate_ids_by_referrals( $referrals );
+		$results    = affiliate_wp()->affiliates->payouts->get_payout_ids_by_affiliates( $affiliates );
+
+		$this->assertEqualSets( $payouts, $results );
+	}
 }
