@@ -182,8 +182,9 @@ class Affiliate_WP_Referral_Payout_Export extends Affiliate_WP_Referral_Export {
 
 			foreach ( $batches as $affiliate_id => $referrals ) {
 				affwp_add_payout( array(
-					'affiliate_id' => $affiliate_id,
-					'referrals'    => $referrals
+					'affiliate_id'  => $affiliate_id,
+					'referrals'     => $referrals,
+					'payout_method' => 'manual',
 				) );
 			}
 		}
