@@ -267,11 +267,7 @@ abstract class AffWP_List_Table extends WP_List_Table {
 	 * @since  1.9
 	 * @return array $table_data All list table data for this list table.
 	 */
-	public function table_data() {
-
-		$table_data = '';
-		return $table_data;
-	}
+	abstract public function data();
 
 	/**
 	 * Prepares the final data for the list table.
@@ -299,7 +295,9 @@ abstract class AffWP_List_Table extends WP_List_Table {
 
 		$this->process_bulk_action();
 
-		$data = ( method_exists( $this, $this->singular . '_data' ) ) ? call_user_func( $this->singular . '_data' ) : $this->table_data();
+		// List tables should define the
+		// query in the data() method.
+		$data = $this->data();
 
 		$current_page = $this->get_pagenum();
 
