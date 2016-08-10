@@ -402,4 +402,129 @@ class Payouts_DB_Tests extends AffiliateWP_UnitTestCase {
 
 		$this->assertEqualSets( $paid, $payout_ids );
 	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_amount_only_should_return_payouts_matching_that_amount() {
+		$payout_id = $this->affwp->payout->create( array(
+			'amount' => '5.00'
+		) );
+		$this->affwp->payout->create_many( 3 );
+
+		$payouts = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'amount' => 5
+		) ), 'payout_id' );
+
+		$this->assertCount( 1, $payouts );
+		$this->assertSame( $payout_id, $payouts[0] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_amount_min_and_max_should_return_payouts_between_them() {
+		$one   = $this->affwp->payout->create( array( 'amount' => '1.00' ) );
+		$three = $this->affwp->payout->create( array( 'amount' => '3.00' ) );
+		$five  = $this->affwp->payout->create( array( 'amount' => '5.00' ) );
+
+		$payouts = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'amount' => array(
+				'min' => 2,
+				'max' => 4
+			)
+		) ), 'payout_id' );
+
+		$this->assertSame( $three, $payouts[0] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_amount_with_greater_than_compare_should_return_payouts_greater_than_amount() {
+		// Default payout is 3.00 (3 referrals x 1.00 each).
+		$three = $this->affwp->payout->create_many( 2 );
+		$four  = $this->affwp->payout->create( array(
+			'amount' => '4.00'
+		) );
+
+		$payouts = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'amount'         => 3,
+			'amount_compare' => '>',
+		) ), 'payout_id' );
+
+		$this->assertSame( $four, $payouts[0] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_amount_with_less_than_compare_should_return_payouts_less_than_amount() {
+		// Default payout is 3.00 (3 referrals x 1.00 each).
+		$three = $this->affwp->payout->create();
+		$four  = $this->affwp->payout->create_many( 2, array(
+			'amount' => '4.00'
+		) );
+
+		$payouts = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'amount'         => 4,
+			'amount_compare' => '<',
+		) ), 'payout_id' );
+
+		$this->assertSame( $three, $payouts[0] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_amount_with_greater_than_equals_should_return_payouts_greater_than_or_equal() {
+		// Default payout is 3.00 (3 referrals x 1.00 each).
+		$three = $this->affwp->payout->create_many( 2 );
+		$four  = $this->affwp->payout->create( array(
+			'amount' => '5.00'
+		) );
+
+		$payouts = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'amount'         => 4,
+			'amount_compare' => '>=',
+		) ), 'payout_id' );
+
+		$this->assertSame( $four, $payouts[0] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_amount_with_less_than_equal_should_return_payouts_less_than_or_equal() {
+		// Default payout is 3.00 (3 referrals x 1.00 each).
+		$three = $this->affwp->payout->create();
+		$four  = $this->affwp->payout->create_many( 2, array(
+			'amount' => '5.00'
+		) );
+
+		$payouts = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'amount'         => 4,
+			'amount_compare' => '<=',
+		) ), 'payout_id' );
+
+		$this->assertSame( $three, $payouts[0] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_amount_with_not_equal_should_return_payouts_not_equal() {
+		// Default payout is 3.00 (3 referrals x 1.00 each).
+		$three = $this->affwp->payout->create();
+		$four  = $this->affwp->payout->create_many( 2, array(
+			'amount' => '5.00'
+		) );
+
+		$payouts = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'amount'         => 5,
+			'amount_compare' => '!=',
+		) ), 'payout_id' );
+
+		$this->assertSame( $three, $payouts[0] );
+	}
 }

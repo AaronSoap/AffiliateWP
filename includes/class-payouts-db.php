@@ -289,7 +289,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *         @type float $max Maximum payout amount. Use -1 for no limit.
 	 *     }
 	 *     @type string       $amount_compare Comparison operator to use in coordination with with $amount when passed
-	 *                                        as a float or string. Accepts '>', '<', '<>', '>=', '<=', '=', or '!='.
+	 *                                        as a float or string. Accepts '>', '<', '>=', '<=', '=', or '!='.
 	 *                                        Default '='.
 	 *     @type string       $payout_method  Payout method to retrieve payouts for.
 	 *     @type string|array $date {
@@ -404,7 +404,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 				$minimum = absint( $amount['min'] );
 				$maximum = absint( $amount['max'] );
 
-				$where .= "`amount` BETWEEN {$minimum} AND {$maximum}";
+				$where .= "`amount` BETWEEN {$minimum} AND {$maximum} ";
 			} else {
 
 				$amount  = absint( $amount );
@@ -413,7 +413,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 				if ( ! empty( $args['amount_compare'] ) ) {
 					$compare = $args['amount_compare'];
 
-					if ( ! in_array( $compare, array( '>', '<', '<>', '>=', '<=', '=', '!=' ) ) ) {
+					if ( ! in_array( $compare, array( '>', '<', '>=', '<=', '=', '!=' ) ) ) {
 						$compare = '=';
 					}
 				}
