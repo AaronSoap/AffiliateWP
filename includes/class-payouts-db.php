@@ -137,7 +137,17 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			}
 		}
 
-		$referrals = $args['referrals'];
+		if ( ! empty( $args['amount'] ) ) {
+			$args['amount'] = affwp_sanitize_amount( $args['amount'] );
+		} else {
+			$amount = 0;
+
+			foreach ( $referrals as $referral ) {
+				$amount += $referral->amount;
+			}
+			$args['amount'] = $amount;
+		}
+
 
 		if ( empty( $args['referrals'] ) ) {
 			$add = false;
@@ -246,29 +256,32 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 * @param array $args {
 	 *     Optional. Arguments for querying affiliates. Default empty array.
 	 *
-	 *     @type int          $number        Number of payouts to query for. Default 20.
-	 *     @type int          $offset        Number of payouts to offset the query for. Default 0.
-	 *     @type int|array    $payout_id     Payout ID or array of payout IDs to explicitly retrieve. Default 0.
-	 *     @type int|array    $affiliate_id  Affiliate ID or array of affiliate IDs to retrieve payouts for. Default 0.
-	 *     @type int|array    $referrals     Array of referral IDsReferral ID or array of referral IDs to retrieve payouts for.
-	 *     @type float|array  $amount        {
+	 *     @type int          $number         Number of payouts to query for. Default 20.
+	 *     @type int          $offset         Number of payouts to offset the query for. Default 0.
+	 *     @type int|array    $payout_id      Payout ID or array of payout IDs to explicitly retrieve. Default 0.
+	 *     @type int|array    $affiliate_id   Affiliate ID or array of affiliate IDs to retrieve payouts for. Default 0.
+	 *     @type int|array    $referrals      Array of referral IDsReferral ID or array of referral IDs to retrieve payouts for.
+	 *     @type float|array  $amount {
 	 *         Payout amount to retrieve payouts for or min/max range to retrieve payouts for.
 	 *
 	 *         @type float $min Minimum payout amount.
 	 *         @type float $max Maximum payout amount. Use -1 for no limit.
 	 *     }
-	 *     @type string       $payout_method Payout method to retrieve payouts for.
-	 *     @type string|array $date          {
+	 *     @type string       $amount_compare Comparison operator to use in coordination with with $amount when passed
+	 *                                        as a float or string. Accepts '>', '<', '<>', '>=', '<=', '=', or '!='.
+	 *                                        Default '='.
+	 *     @type string       $payout_method  Payout method to retrieve payouts for.
+	 *     @type string|array $date {
 	 *         Date string or start/end range to retrieve payouts for.
 	 *
 	 *         @type string $start Start date to retrieve payouts for.
 	 *         @type string $end   End date to retrieve payouts for.
 	 *     }
-	 *     @type string       $status        Payout status. Default is 'paid' unless there's a problem.
-	 *     @type string       $order         How to order returned payout results. Accepts 'ASC' or 'DESC'.
-	 *                                       Default 'DESC'.
-	 *     @type string       $orderby       Payouts table column to order results by. Accepts any AffWP\Affiliate\Payout
-	 *                                       field. Default 'payout_id'.
+	 *     @type string       $status         Payout status. Default is 'paid' unless there's a problem.
+	 *     @type string       $order          How to order returned payout results. Accepts 'ASC' or 'DESC'.
+	 *                                        Default 'DESC'.
+	 *     @type string       $orderby        Payouts table column to order results by. Accepts any AffWP\Affiliate\Payout
+	 *                                        field. Default 'payout_id'.
 	 * }
 	 * @param bool  $count Optional. Whether to return only the total number of results found. Default false.
 	 * @return array Array of payout objects (if found).
@@ -277,18 +290,19 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		global $wpdb;
 
 		$defaults = array(
-			'number'        => 20,
-			'offset'        => 0,
-			'payout_id'     => 0,
-			'affiliate_id'  => 0,
-			'referrals'     => 0,
-			'amount'        => 0,
-			'payout_method' => '',
-			'status'        => 'paid',
-			'date'          => '',
-			'order'         => 'DESC',
-			'orderby'       => 'payout_id',
-			'search'        => false,
+			'number'         => 20,
+			'offset'         => 0,
+			'payout_id'      => 0,
+			'affiliate_id'   => 0,
+			'referrals'      => 0,
+			'amount'         => 0,
+			'amount_compare' => '=',
+			'payout_method'  => '',
+			'status'         => 'paid',
+			'date'           => '',
+			'order'          => 'DESC',
+			'orderby'        => 'payout_id',
+			'search'         => false,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -360,19 +374,30 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		// Amount.
 		if ( ! empty( $args['amount'] ) ) {
 
-			if ( is_array( $args['amount'] ) ) {
+			$amount = $args['amount'];
 
-				if ( ! empty( $args['amount']['min'] ) ) {
+			$where .= empty( $where ) ? "WHERE " : "AND ";
 
-				}
+			if ( is_array( $amount ) && ! empty( $amount['min'] ) && ! empty( $amount['max'] ) ) {
 
-				if ( ! empty( $args['amount']['max'] ) ) {
+				$minimum = absint( $amount['min'] );
+				$maximum = absint( $amount['max'] );
 
-				}
-
+				$where .= "`amount` BETWEEN {$minimum} AND {$maximum}";
 			} else {
 
+				$amount  = absint( $amount );
+				$compare = '=';
 
+				if ( ! empty( $args['amount_compare'] ) ) {
+					$compare = $args['amount_compare'];
+
+					if ( ! in_array( $compare, array( '>', '<', '<>', '>=', '<=', '=', '!=' ) ) ) {
+						$compare = '=';
+					}
+				}
+
+				$where .= "`amount` {$compare} {$amount} ";
 			}
 
 		}
