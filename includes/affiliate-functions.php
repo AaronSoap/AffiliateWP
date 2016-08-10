@@ -1306,7 +1306,7 @@ function affwp_get_affiliate_area_page_url( $tab = '' ) {
 	$affiliate_area_page_url = get_permalink( $affiliate_area_page_id );
 
 	if ( ! empty( $tab )
-		&& in_array( $tab, array( 'urls', 'stats', 'graphs', 'referrals', 'visits', 'creatives', 'settings' ) )
+		&& in_array( $tab, array( 'urls', 'stats', 'graphs', 'referrals', 'payouts', 'visits', 'creatives', 'settings' ) )
 	) {
 		$affiliate_area_page_url = add_query_arg( array( 'tab' => $tab ), $affiliate_area_page_url );
 	}
@@ -1342,7 +1342,7 @@ function affwp_get_active_affiliate_area_tab() {
 	 */
 	$tabs = apply_filters( 'affwp_affiliate_area_tabs', array(
 		'urls', 'stats', 'graphs', 'referrals',
-		'visits', 'creatives', 'settings'
+		'payouts', 'visits', 'creatives', 'settings'
 	) );
 
 	// If the tab can't be shown, remove it from play.
