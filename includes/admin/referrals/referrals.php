@@ -526,8 +526,6 @@ class AffWP_Referrals_Table extends WP_List_Table {
 						'payout_method' => 'manual'
 					) );
 				}
-
-				affwp_set_referral_status( $id, 'paid' );
 			}
 
 			if ( 'mark_as_unpaid' === $this->current_action() ) {

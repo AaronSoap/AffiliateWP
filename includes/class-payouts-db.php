@@ -190,7 +190,9 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 
 			// Add the payout IDs to the referral records.
 			foreach ( $referrals as $referral ) {
-				affiliate_wp()->referrals->update( $referral->ID, array( 'payout_id' => $add ), '', 'referral' );
+				if ( affiliate_wp()->referrals->update( $referral->ID, array( 'payout_id' => $add ), '', 'referral' ) ) {
+					affwp_set_referral_status( $referral, 'paid' );
+				}
 			}
 
 			return $add;

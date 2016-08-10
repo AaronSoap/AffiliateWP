@@ -309,26 +309,6 @@ class Payouts_DB_Tests extends AffiliateWP_UnitTestCase {
 	/**
 	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
 	 */
-	public function test_get_payouts_with_single_unpaid_referral_id_should_ignore_referrals_arg() {
-		$this->affwp->payout->create_many( 3 );
-		$payout_id = $this->affwp->payout->create( array(
-			'affiliate_id' => $affiliate = $this->affwp->affiliate->create(),
-			'referrals'    => $referral = $this->affwp->referral->create( array(
-				'affiliate_id' => $affiliate,
-				'status'       => 'unpaid'
-			) )
-		) );
-
-		$payouts = affiliate_wp()->affiliates->payouts->get_payouts( array(
-			'referrals' => $referral
-		) );
-
-		$this->assertFalse( 1 === count( $payouts ) );
-	}
-
-	/**
-	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
-	 */
 	public function test_get_payouts_with_multiple_unpaid_referrals_should_ignore_referrals_arg() {
 		$this->affwp->payout->create();
 
