@@ -18,7 +18,8 @@ class AffWP_Factory_For_Payouts extends WP_UnitTest_Factory_For_Thing {
 		if ( empty( $args['referrals'] ) ) {
 			$args['referrals'] = $referral->create_many( 3, array(
 				'affiliate_id' => $args['affiliate_id'],
-				'status'       => 'paid'
+				'status'       => 'paid',
+				'amount'       => '1.00',
 			) );
 		}
 

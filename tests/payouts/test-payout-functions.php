@@ -40,6 +40,46 @@ class Payout_Function_Tests extends AffiliateWP_UnitTestCase {
 	}
 
 	/**
+	 * @covers affwp_add_payout()
+	 */
+	public function test_add_payout_without_affiliate_id_should_return_false() {
+		$this->assertFalse( affwp_add_payout( array(
+			'referrals' => range( 1, 3 )
+		) ) );
+	}
+
+	/**
+	 * @covers affwp_add_payout()
+	 */
+	public function test_add_payout_with_empty_referrals_should_return_false() {
+		$this->assertFalse( affwp_add_payout( array(
+			'affiliate_id' => 1
+		) ) );
+	}
+
+	/**
+	 * @covers affwp_add_payout()
+	 */
+	public function test_add_payout_should_return_payout_id_on_success() {
+		$this->assertTrue( false !== affwp_add_payout( array(
+			'affiliate_id' => $affiliate_id = $this->affwp->affiliate->create(),
+			'referrals'    => $this->affwp->referral->create( array(
+				'affiliate_id' => $affiliate_id
+			) )
+		) ) );
+	}
+
+	/**
+	 * @covers affwp_add_payout()
+	 */
+	public function test_add_payout_should_return_false_on_failure() {
+		$this->assertFalse( affwp_add_payout( array(
+			'affiliate_id' => 1,
+			'referrals'    => range( 1, 2 )
+		) ) );
+	}
+
+	/**
 	 * @covers affwp_delete_payout()
 	 */
 	public function test_delete_payout_should_return_false_if_invalid_payout_id() {
