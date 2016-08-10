@@ -81,22 +81,92 @@ abstract class AffWP_List_Table extends WP_List_Table {
 	 * @return void
 	 */
 	public function search_box( $text, $input_id ) {
-		if ( empty( $_REQUEST['s'] ) && !$this->has_items() )
+		if ( empty( $_REQUEST['s'] ) && !$this->has_items() ) {
 			return;
+		}
 
 		$input_id = $input_id . '-search-input';
 
-		if ( ! empty( $_REQUEST['orderby'] ) )
+		if ( ! empty( $_REQUEST['orderby'] ) ) {
 			echo '<input type="hidden" name="orderby" value="' . esc_attr( $_REQUEST['orderby'] ) . '" />';
-		if ( ! empty( $_REQUEST['order'] ) )
+		}
+
+		if ( ! empty( $_REQUEST['order'] ) ) {
 			echo '<input type="hidden" name="order" value="' . esc_attr( $_REQUEST['order'] ) . '" />';
+		}
+
 		?>
+
 		<p class="search-box">
 			<label class="screen-reader-text" for="<?php echo $input_id ?>"><?php echo $text; ?>:</label>
 			<input type="search" id="<?php echo $input_id ?>" name="s" value="<?php _admin_search_query(); ?>" />
 			<?php submit_button( $text, 'button', false, false, array( 'ID' => 'search-submit' ) ); ?>
 		</p>
 	<?php
+	}
+
+	/**
+	 * Set the views available to the get_views() method.
+	 *
+	 * Provide an array of arrays of views.
+	 *
+	 * For each view, four parameters may be specified:
+	 *
+	 * $key             The key used for queries and identidication of this view,
+	 *                  such as 'all' or 'paid'.
+	 *
+	 * $key => $value   The term used in the column header, specified as the value of the first key
+	 *                  in the array. Typically with the first letter capitalized.
+	 *
+	 * 'add_query_arg'  Boolean. If set to true, the link within sprintf will render add_query_arg.
+	 *                  If false, remove_query_arg will be rendered instead.
+	 *
+	 * 'data'           The data parameter to use for this view. $this->get_views() will check for
+	 *                  a defined property with which to get this data, in the followin order:
+	 *
+	 *                      1. An existing local variable defined within the method.
+	 *                      2. An existing variable defined within the list table class.
+	 *                      3. An existing method defined within the list table class.
+	 *
+	 *                  If all of these checks fail, the $data_property will return false,
+	 *                  If $this-debug is set to true, a failure of these check will also
+	 *                  generate a notice in the error_log.
+	 *
+	 *                  The 'data' parameter will be wrapped in a <span> with a class of "count".
+	 *
+	 * Example:
+	 *
+	 *    $args = array(
+	 *		'all' => array(
+	 *			'all'           => __( 'All', 'affiliate-wp' ),
+	 *			'add_query_arg' => true,
+	 *			'data'          => $total_count
+	 *			),
+	 *      'paid' => array(
+	 *			'paid'          => __( 'Paid', 'affiliate-wp' ),
+	 *			'add_query_arg' => false,
+	 *			'data'          => $paid_count
+	 *			),
+     *
+     *		);
+     *
+     *     return $args;
+	 *
+	 * @since  1.9
+	 *
+	 * @return  array An array of views available.
+	 */
+	public function set_views() {
+
+		$args = array(
+			'all' => array(
+				'all'          => __( 'All', 'affiliate-wp' ),
+				'add_query_arg' => true,
+				'data' => $total_count
+				),
+
+			);
+		return $args;
 	}
 
 	/**
@@ -107,13 +177,43 @@ abstract class AffWP_List_Table extends WP_List_Table {
 	 * @return array $views All the views available for this class.
 	 */
 	public function get_views() {
-		$base           = admin_url( 'admin.php?page=affiliate-wp-' . $this->singular );
 
-		$current        = isset( $_GET['status'] ) ? $_GET['status'] : '';
+		$base    = admin_url( 'admin.php?page=affiliate-wp-' . $this->plural );
+		$current = isset( $_GET['status'] ) ? $_GET['status'] : '';
 
-		$views = array(
-			'all'		=> sprintf( '<a href="%s"%s>%s</a>', esc_url( remove_query_arg( 'status', $base ) ), $current === 'all' || $current == '' ? ' class="current"' : '', __('All', 'affiliate-wp') . $total_count )
-		);
+		$views   = array();
+		$args    = $this->set_views();
+
+		foreach ( $args as $key => $value ) {
+
+			$term = $value[ $key ];
+			$data = $value[ 'data' ];
+
+			// Check if a variable is locally defined matching the $data name.
+			if ( isset( $data ) ) {
+				$data_property = $data;
+			// Check if a variable is defined in this class matching the $data name.
+			} else if ( $this->{$value[ 'data' ]} ) {
+				$data_property = $this->{$value[ 'data' ]};
+			// Check if a method is defined in this class matching the $data name.
+			} else if ( method_exists( $this, $data ) ) {
+				$data_property = $this->{$data}();
+			} else {
+				$data_property = '';
+				error_log( 'Unable to locate variable or method for ' . $data . 'property' );
+			}
+
+			$data_display = '&nbsp;<span class="count">(' . $data_property  . ')</span>';
+			$add          = add_query_arg( 'status',    $base );
+			$remove       = remove_query_arg( 'status', $base );
+			$query_arg    = ( $value[ 'add_query_arg' ] ) ? $add: $remove;
+
+			$view = array(
+				$key => sprintf( '<a href="%s"%s>%s</a>', esc_url( $query_arg ), $current === $key || $current == '' ? ' class="current"' : '', $term . $data_display )
+				);
+
+			array_push( $views, $view );
+		}
 
 		return $views;
 	}
