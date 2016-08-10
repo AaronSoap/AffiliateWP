@@ -34,7 +34,7 @@
 				<?php foreach ( $payouts as $payout ) : ?>
 					<tr>
 						<td>
-							<?php echo esc_html( mysql2date( 'Y-m-d H:i:s', $payout->date, true ) ); ?>
+							<?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $payout->date ) ) ); ?>
 						</td>
 						<td>
 							<?php echo affwp_currency_filter( affwp_format_amount( $payout->amount ) ); ?>
