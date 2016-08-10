@@ -109,31 +109,52 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 */
 	public function add( $data = array() ) {
 
-		$defaults = array(
-			'affiliate_id' => 0,
-			'referrals'    => array(),
-			'amount'       => 0,
-		);
+		$args = wp_parse_args( $data, array(
+			'affiliate_id'  => 0,
+			'referrals'     => array(),
+			'amount'        => 0,
+			'payout_method' => '',
+			'status'        => 'paid',
+		) );
 
-		$args = wp_parse_args( $data, $defaults );
+		$args['affiliate_id'] = absint( $args['affiliate_id'] );
 
 		if ( ! affiliate_wp()->affiliates->affiliate_exists( $args['affiliate_id'] ) ) {
 			return false;
 		}
 
-		if ( ! is_array( $args['referrals'] ) ) {
-			$args['referrals'] = (array) $args['referrals'];
+		if ( ! empty( $args['payout_method'] ) ) {
+			$args['payout_method'] = sanitize_text_field( $args['payout_method'] );
 		}
 
-		foreach ( $args['referrals'] as $index => $referral_id ) {
+		/**
+		 * Filters the payout method when adding a payout.
+		 *
+		 * @since 1.9
+		 *
+		 * @param string $payout_method Payout method.
+		 * @param array  $args          Data for adding a payout.
+		 */
+		$args['payout_method'] = apply_filters( 'affwp_add_payout_method', $args['payout_method'], $args );
+
+		if ( ! empty( $args['status'] ) ) {
+			$args['status'] = sanitize_key( $args['status'] );
+		}
+
+		if ( is_array( $args['referrals'] ) ) {
+			$args['referrals'] = array_map( 'absint', $args['referrals'] );
+		} else {
+			$args['referrals'] = (array) absint( $args['referrals'] );
+		}
+
+		$referrals = array();
+
+		foreach ( $args['referrals'] as $referral_id ) {
 			if ( $referral = affwp_get_referral( $referral_id ) ) {
-				// Referral affiliate doesn't match.
-				if ( $args['affiliate_id'] !== $referral->affiliate_id ) {
-					unset( $args['referrals'][ $index ] );
+				// Only keep it if the referral is real and the affiliate IDs match.
+				if ( $args['affiliate_id'] === $referral->affiliate_id ) {
+					$referrals[] = $referral;
 				}
-			} else {
-				// Referral doesn't exist. Drop it.
-				unset( $args['referrals'][ $index ] );
 			}
 		}
 
@@ -149,10 +170,10 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		}
 
 
-		if ( empty( $args['referrals'] ) ) {
+		if ( empty( $referrals ) ) {
 			$add = false;
 		} else {
-			$args['referrals'] = implode( ',', $args['referrals'] );
+			$args['referrals'] = implode( ',', wp_list_pluck( $referrals, 'referral_id' ) );
 
 			$add = $this->insert( $args, 'payout' );
 		}
@@ -168,8 +189,8 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			do_action( 'affwp_insert_payout', $add );
 
 			// Add the payout IDs to the referral records.
-			foreach ( $referrals as $referral_id ) {
-				affiliate_wp()->referrals->update( $referral_id, array( 'payout_id' => $add ), '', 'referral' );
+			foreach ( $referrals as $referral ) {
+				affiliate_wp()->referrals->update( $referral->ID, array( 'payout_id' => $add ), '', 'referral' );
 			}
 
 			return $add;
