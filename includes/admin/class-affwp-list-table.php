@@ -219,13 +219,28 @@ abstract class AffWP_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Retrieve the table columns
+	 * Retrieve the table columns.
+	 *
+	 * @access public
+	 * @since  1.9
+	 * @return array $columns Array of all the list table columns.
+	 * @uses   $this->_get_columns()
+	 */
+	public function get_columns() {
+		$columns = $this->_get_columns();
+
+		return $columns;
+
+	}
+
+	/**
+	 * Set the table columns.
 	 *
 	 * @access public
 	 * @since  1.9
 	 * @return array $columns Array of all the list table columns.
 	 */
-	public function get_columns() {
+	private function _get_columns() {
 		$columns = array();
 
 		/**
@@ -242,7 +257,6 @@ abstract class AffWP_List_Table extends WP_List_Table {
 		 * @since  1.9
 		 */
 		return apply_filters( 'affwp_list_table_' . $this->singular . '_table_columns', $columns );
-
 	}
 
 	/**
@@ -253,6 +267,19 @@ abstract class AffWP_List_Table extends WP_List_Table {
 	 * @return array Array of all the sortable columns.
 	 */
 	public function get_sortable_columns() {
+		$sortable_columns = $this->_get_sortable_columns();
+
+		return $sortable_columns;
+	}
+
+	/**
+	 * Set the table's sortable columns.
+	 *
+	 * @access public
+	 * @since  1.9
+	 * @return array Array of all the sortable columns.
+	 */
+	private function _get_sortable_columns() {
 		$sortable_columns = array();
 
 		/**
