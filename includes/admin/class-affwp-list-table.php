@@ -299,7 +299,7 @@ abstract class AffWP_List_Table extends WP_List_Table {
 
 		$this->process_bulk_action();
 
-		$data = ( method_exists( $this, $this->plural . 'data' ) ) ? call_user_func( $this->plural . '_data' ) : $this->table_data();
+		$data = ( method_exists( $this, $this->singular . '_data' ) ) ? call_user_func( $this->singular . '_data' ) : $this->table_data();
 
 		$current_page = $this->get_pagenum();
 
