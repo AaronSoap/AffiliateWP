@@ -23,8 +23,6 @@ class AffWP_Affiliate_Payout_Tests extends AffiliateWP_UnitTestCase {
 	 * @covers AffWP\Object::get_instance()
 	 */
 	public function test_get_instance_with_payout_id_should_return_Payout_object() {
-		$user_id = $this->factory->user->create();
-
 		$payout_id = $this->affwp->payout->create();
 
 		$payout = Payout::get_instance( $payout_id );
