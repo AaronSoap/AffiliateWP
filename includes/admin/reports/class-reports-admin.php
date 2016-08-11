@@ -19,7 +19,7 @@ class AffWP_Reports_Admin {
 		add_action( 'affwp_reports_tab_affiliates', array( $this, 'affiliates' ) );
 		add_action( 'affwp_reports_tab_referrals',  array( $this, 'referrals' ) );
 		add_action( 'affwp_reports_tab_visits',     array( $this, 'visits' ) );
-		// add_action( 'affwp_reports_tab_campaigns',  array( $this, 'campaigns' ) );
+		add_action( 'affwp_reports_tab_campaigns',  array( $this, 'campaigns' ) );
 
 	}
 
@@ -83,7 +83,7 @@ class AffWP_Reports_Admin {
 		$tabs['affiliates']  = __( 'Affiliates',  'affiliate-wp' );
 		$tabs['referrals']   = __( 'Referrals',   'affiliate-wp' );
 		$tabs['visits']      = __( 'Visits',      'affiliate-wp' );
-		// $tabs['campaigns']   = __( 'Campaigns',   'affiliate-wp' );
+		$tabs['campaigns']   = __( 'Campaigns',   'affiliate-wp' );
 
 		return apply_filters( 'affwp_reports_tabs', $tabs );
 	}
@@ -257,16 +257,15 @@ class AffWP_Reports_Admin {
 	 * @since 1.9
 	 * @return void
 	 */
-	// public function campaigns() {
+	public function campaigns() {
 
-	// 	require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/reports/class-campaigns-list-table.php';
+		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/reports/class-reports-campaigns-list-table.php';
 
-	// 	$campaigns_list_table = new AffWP_Reports_Campaigns_List_Table;
-	// 	$campaigns_list_table->prepare_items();
-	// 	$campaigns_list_table->display();
+		$campaigns_list_table = new AffWP_Reports_Campaigns_List_Table;
+		$campaigns_list_table->prepare_items();
+		$campaigns_list_table->display();
 
-	// }
-
+	}
 
 }
 
