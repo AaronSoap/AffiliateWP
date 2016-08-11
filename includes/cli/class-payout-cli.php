@@ -80,8 +80,10 @@ class CLI extends \AffWP\Object\CLI {
 	 * : Affiliate username or ID
 	 *
 	 * <referrals>
-	 * : Referral ID or comma-separated list of referral IDs to associate with the payout. Pass 'all'
-	 * to generate a payout for all unpaid referrals for this affiliate.
+	 * : Referral ID or comma-separated list of referral IDs to associate with the payout.
+	 *
+	 * * Pass 'all' to generate a payout for all unpaid referrals for this affiliate.
+	 * * Pass 'dates' and use --date or --start_date / --end_date to generate a payout based on referral dates.
 	 *
 	 * [--amount=<number>]
 	 * : Payout amount.
@@ -153,23 +155,6 @@ class CLI extends \AffWP\Object\CLI {
 		$data['status']         = Utils\get_flag_value( $assoc_args, 'status'        , 'paid' );
 		$data['affiliate_id']   = $affiliate->ID;
 
-		$date       = Utils\get_flag_value( $assoc_args, 'date',       '' );
-		$start_date = Utils\get_flag_value( $assoc_args, 'start_date', '' );
-		$end_date   = Utils\get_flag_value( $assoc_args, 'end_date',   '' );
-
-		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$data['date'] = array(
-				'start' => $start_date,
-				'end'   => $end_date
-			);
-		} elseif ( ! empty( $start_date ) && empty( $end_date ) ) {
-			$data['date']['start'] = $start_date;
-		} elseif ( ! empty( $end_date ) && empty( $start_date ) ) {
-			$data['date']['end'] = $end_date;
-		} elseif ( ! empty( $date ) ) {
-			$data['date'] = $date;
-		}
-
 		$amount_min = Utils\get_flag_value( $assoc_args, 'amount_min', 0 );
 		$amount_max = Utils\get_flag_value( $assoc_args, 'amount_max', 0 );
 
@@ -180,12 +165,43 @@ class CLI extends \AffWP\Object\CLI {
 			);
 		}
 
+		$referral_args = array(
+			'number'       => - 1,
+			'status'       => 'unpaid',
+			'affiliate_id' => $affiliate->ID
+		);
+
 		if ( 'all' === $args[1] ) {
-			$data['referrals'] = wp_list_pluck( affiliate_wp()->referrals->get_referrals( array(
-				'number'       => -1,
-				'status'       => 'unpaid',
-				'affiliate_id' => $affiliate->ID
-			) ), 'referral_id' );
+			$data['referrals'] = wp_list_pluck(
+				affiliate_wp()->referrals->get_referrals( $referral_args ),
+				'referral_id'
+			);
+		} elseif ( 'dates' === $args[1] ) {
+			$date       = Utils\get_flag_value( $assoc_args, 'date',       '' );
+			$start_date = Utils\get_flag_value( $assoc_args, 'start_date', '' );
+			$end_date   = Utils\get_flag_value( $assoc_args, 'end_date',   '' );
+
+			if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+				$referral_args['date'] = array(
+					'start' => $start_date,
+					'end'   => $end_date
+				);
+			} elseif ( ! empty( $start_date ) && empty( $end_date ) ) {
+				$referral_args['date']['start'] = $start_date;
+			} elseif ( ! empty( $end_date ) && empty( $start_date ) ) {
+				$referral_args['date']['end'] = $end_date;
+			} elseif ( ! empty( $date ) ) {
+				$referral_args['date'] = $date;
+			}
+
+			if ( empty( $referral_args['date'] ) ) {
+				\WP_CLI::error( __( 'Date parameters must be defined to retrieve referrals by date.', 'affiliate-wp' ) );
+			}
+
+			$data['referrals'] = wp_list_pluck(
+				affiliate_wp()->referrals->get_referrals( $referral_args ),
+				'referral_id'
+			);
 		} elseif ( false !== strpos( $args[1], ',' ) ) {
 			$data['referrals'] = wp_parse_id_list( $args[1] );
 		} else {
