@@ -26,7 +26,7 @@ class AffWP_Reports_Admin {
 	/**
 	 * Render the admin area.
 	 *
-	 * @since  [since]
+	 * @since  1.9
 	 *
 	 * @return void
 	 */
@@ -79,13 +79,28 @@ class AffWP_Reports_Admin {
 	 */
 	public function get_reports_tabs() {
 
-		$tabs               = array();
-		$tabs['referrals']  = __( 'Referrals',  'affiliate-wp' );
-		$tabs['visits']     = __( 'Visits',     'affiliate-wp' );
-		$tabs['campaigns']  = __( 'Campaigns',  'affiliate-wp' );
-		$tabs['registrations'] = __( 'Campaigns', 'affiliate-wp' );
+		$tabs                = array();
+		$tabs['affiliates']  = __( 'Affiliates',  'affiliate-wp' );
+		$tabs['referrals']   = __( 'Referrals',  'affiliate-wp' );
+		$tabs['visits']      = __( 'Visits',     'affiliate-wp' );
+		$tabs['campaigns']   = __( 'Campaigns',  'affiliate-wp' );
+		// Registration to be located in Affiliates tab
+		// $tabs['registrations'] = __( 'Registrations', 'affiliate-wp' );
 
 		return apply_filters( 'affwp_reports_tabs', $tabs );
+	}
+
+	/**
+	 * Display the referrals reports tab
+	 *
+	 * @since 1.9
+	 * @return void
+	 */
+	public function affiliates() {
+		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/reports/class-reports-affiliates-list-table.php';
+		$affiliate_list_table = new AffWP_Reports_Affiliate_List_Table;
+		$affiliate_list_table->prepare_items();
+		$affiliate_list_table->display();
 	}
 
 	/**
