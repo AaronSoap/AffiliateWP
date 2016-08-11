@@ -305,6 +305,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *                                        Default 'DESC'.
 	 *     @type string       $orderby        Payouts table column to order results by. Accepts any AffWP\Affiliate\Payout
 	 *                                        field. Default 'payout_id'.
+	 *     @type string       $fields         Fields to limit the selection for. Accepts 'ids'. Default '*' for all.
 	 * }
 	 * @param bool  $count Optional. Whether to return only the total number of results found. Default false.
 	 * @return array Array of payout objects (if found).
@@ -325,6 +326,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			'date'           => '',
 			'order'          => 'DESC',
 			'orderby'        => 'payout_id',
+			'fields'         => '',
 			'search'         => false,
 		);
 
@@ -525,6 +527,16 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		$args['orderby'] = $orderby;
 		$args['order']   = $order;
 
+		$fields = "*";
+
+		if ( ! empty( $args['fields'] ) ) {
+			switch ( $args['fields'] ) {
+				case 'ids':
+					$fields = 'payout_id';
+					break;
+			}
+		}
+
 		$key = ( true === $count ) ? md5( 'affwp_payouts_count' . serialize( $args ) ) : md5( 'affwp_payouts_' . serialize( $args ) );
 
 		$last_changed = wp_cache_get( 'last_changed', $this->cache_group );
@@ -542,6 +554,19 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 
 				$results = absint( $wpdb->get_var( "SELECT COUNT({$this->primary_key}) FROM {$this->table_name} {$where};" ) );
 
+			} elseif ( 'ids' === $args['fields'] ) {
+
+				$results = $wpdb->get_col(
+					$wpdb->prepare(
+						"SELECT {$fields} FROM {$this->table_name} {$where} ORDER BY {$orderby} {$order} LIMIT %d, %d;",
+						absint( $args['offset'] ),
+						absint( $args['number'] )
+					)
+				);
+
+				// Ensure returned IDs are integers.
+				$results = array_map( 'intval', $results );
+
 			} else {
 
 				$results = $wpdb->get_results(
@@ -552,12 +577,9 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 					)
 				);
 
+				// Convert to AffWP\Affiliate\Payout objects.
+				$results = array_map( 'affwp_get_payout', $results );
 			}
-		}
-
-		// Convert to AffWP\Affiliate\Payout objects.
-		if ( is_array( $results ) ) {
-			$results = array_map( 'affwp_get_payout', $results );
 		}
 
 		wp_cache_add( $cache_key, $results, $this->cache_group, HOUR_IN_SECONDS );

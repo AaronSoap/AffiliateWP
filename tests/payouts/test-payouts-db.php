@@ -509,6 +509,43 @@ class Payouts_DB_Tests extends AffiliateWP_UnitTestCase {
 	}
 
 	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_with_count_true_should_return_a_count_only() {
+		$payouts = $this->affwp->payout->create_many( 3 );
+
+		$this->assertSame( 3, affiliate_wp()->affiliates->payouts->get_payouts( array(), true ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_fields_ids_should_return_an_array_of_ids_only() {
+		$payout_ids = $this->affwp->payout->create_many( 3 );
+
+		$results = affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'fields' => 'ids',
+			'order'  => 'ASC', // Default 'DESC'
+		) );
+
+		$this->assertEqualSets( $payout_ids, $results );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_invalid_fields_arg_should_return_regular_Payout_object_results() {
+		$payouts = $this->affwp->payout->create_many( 3 );
+		$payouts = array_map( 'affwp_get_payout', $payouts );
+
+		$results = affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'fields' => 'foo'
+		) );
+
+		$this->assertEqualSets( $payouts, $results );
+	}
+
+	/**
 	 * @covers Affiliate_WP_Payouts_DB::get_affiliate_ids_by_referrals()
 	 */
 	public function test_get_affiliate_ids_by_referrals_should_reject_invalid_referrals() {
