@@ -79,12 +79,15 @@ class CLI extends \AffWP\Object\CLI {
 	 * <username|ID>
 	 * : Affiliate username or ID
 	 *
-	 * <referrals>...
+	 * <referrals>
 	 * : Referral ID or comma-separated list of referral IDs to associate with the payout. Pass 'all'
 	 * to generate a payout for all unpaid referrals for this affiliate.
 	 *
 	 * [--amount=<number>]
 	 * : Payout amount.
+	 *
+	 * [--amount_compare=<operator>]
+	 * : Comparison operator to use in conjunction with --amount. Accepts '>', '<', '>=', '<=', '=', or '!='.
 	 *
 	 * [--amount_min=<number>]
 	 * : Minimum amount to search for. --amount_max must also be passed for this to work.
@@ -92,8 +95,16 @@ class CLI extends \AffWP\Object\CLI {
 	 * [--amount_max=<number>]
 	 * : Maximum amount to search for. --amount_min must also be passed for this to work.
 	 *
-	 * [--amount_compare=<operator>]
-	 * : Comparison operator to use in conjunction with --amount. Accepts '>', '<', '>=', '<=', '=', or '!='.
+	 * [--date=<date>]
+	 * : Date to pay out referrals for. Intended to be used in place of --date_start and/or --date_end.
+	 *
+	 * [--start_date=<date>]
+	 * : Starting date to pay out referrals for. Can be used without --date_end to pay out referrals
+	 * on or after this date.
+	 *
+	 * [--end_date=<date>]
+	 * : Starting date to pay out referrals for. Can be used without --date_start to pay out referrals
+	 * on or before this date.
 	 *
 	 * [--method=<method>]
 	 * : Payout method. Default empty.
@@ -141,6 +152,23 @@ class CLI extends \AffWP\Object\CLI {
 		$data['payout_method']  = Utils\get_flag_value( $assoc_args, 'method'        , ''     );
 		$data['status']         = Utils\get_flag_value( $assoc_args, 'status'        , 'paid' );
 		$data['affiliate_id']   = $affiliate->ID;
+
+		$date       = Utils\get_flag_value( $assoc_args, 'date',       '' );
+		$start_date = Utils\get_flag_value( $assoc_args, 'start_date', '' );
+		$end_date   = Utils\get_flag_value( $assoc_args, 'end_date',   '' );
+
+		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+			$data['date'] = array(
+				'start' => $start_date,
+				'end'   => $end_date
+			);
+		} elseif ( ! empty( $start_date ) && empty( $end_date ) ) {
+			$data['date']['start'] = $start_date;
+		} elseif ( ! empty( $end_date ) && empty( $start_date ) ) {
+			$data['date']['end'] = $end_date;
+		} elseif ( ! empty( $date ) ) {
+			$data['date'] = $date;
+		}
 
 		$amount_min = Utils\get_flag_value( $assoc_args, 'amount_min', 0 );
 		$amount_max = Utils\get_flag_value( $assoc_args, 'amount_max', 0 );
