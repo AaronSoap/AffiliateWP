@@ -371,13 +371,15 @@ final class Affiliate_WP {
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/class-object-cli.php';
 
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/utils/class-affiliate-cli-fetcher.php';
-			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/utils/class-referral-cli-fetcher.php';
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/utils/class-creative-cli-fetcher.php';
+			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/utils/class-payout-cli-fetcher.php';
+			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/utils/class-referral-cli-fetcher.php';
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/utils/class-visit-cli-fetcher.php';
 
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/class-affiliate-cli.php';
-			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/class-referral-cli.php';
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/class-creative-cli.php';
+			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/class-payout-cli.php';
+			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/class-referral-cli.php';
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/cli/class-visit-cli.php';
 		}
 	}
