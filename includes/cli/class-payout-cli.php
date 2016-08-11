@@ -133,15 +133,24 @@ class CLI extends \AffWP\Object\CLI {
 			\WP_CLI::error( sprintf( __( 'An affiliate with the ID or username "%s" does not exist. See wp affwp affiliate create for adding affiliates.', 'affiliate-wp' ), $args[0] ) );
 		}
 
+		$data = array();
+
 		// Grab flag values.
-		$data['amount']         = Utils\get_flag_value( $assoc_args, 'amount'        , 0      );
+		$data['amount']         = Utils\get_flag_value( $assoc_args, 'amount'        , ''     );
 		$data['amount_compare'] = Utils\get_flag_value( $assoc_args, 'amount_compare', ''     );
-//		$data['amount']['min']  = Utils\get_flag_value( $assoc_args, 'amount_min'    , 0      );
-//		$data['amount']['max']  = Utils\get_flag_value( $assoc_args, 'amount_max'    , 0      );
 		$data['payout_method']  = Utils\get_flag_value( $assoc_args, 'method'        , ''     );
 		$data['status']         = Utils\get_flag_value( $assoc_args, 'status'        , 'paid' );
-
 		$data['affiliate_id']   = $affiliate->ID;
+
+		$amount_min = Utils\get_flag_value( $assoc_args, 'amount_min', 0 );
+		$amount_max = Utils\get_flag_value( $assoc_args, 'amount_max', 0 );
+
+		if ( empty( $data['amount'] ) && ( ! empty( $amount_min ) && ! empty( $amount_max ) ) ) {
+			$data['amount'] = array(
+				'min' => $amount_min,
+				'max' => $amount_max
+			);
+		}
 
 		if ( 'all' === $args[1] ) {
 			$data['referrals'] = wp_list_pluck( affiliate_wp()->referrals->get_referrals( array(
