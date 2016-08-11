@@ -574,3 +574,14 @@ function affwp_make_url_human_readable( $url ) {
 function affwp_affiliate_area_show_tab( $tab = '' ) {
 	return apply_filters( 'affwp_affiliate_area_show_tab', true, $tab );
 }
+
+
+/**
+ * Get the logout URL
+ *
+ * @since  1.8.8
+ * @return string logout URL
+ */
+function affwp_get_logout_url() {
+	return apply_filters( 'affwp_logout_url', wp_logout_url( get_permalink() ) );
+}
