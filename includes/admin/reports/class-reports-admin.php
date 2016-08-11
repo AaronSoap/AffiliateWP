@@ -17,9 +17,9 @@ class AffWP_Reports_Admin {
 
 	public function __construct(){
 		add_action( 'affwp_reports_tab_affiliates', array( $this, 'affiliates' ) );
-		add_action( 'affwp_reports_tab_referrals', array( $this, 'referrals' ) );
-		add_action( 'affwp_reports_tab_visits', array( $this, 'visits' ) );
-		add_action( 'affwp_reports_tab_registrations', array( $this, 'registrations' ) );
+		add_action( 'affwp_reports_tab_referrals',  array( $this, 'referrals' ) );
+		add_action( 'affwp_reports_tab_visits',     array( $this, 'visits' ) );
+		// add_action( 'affwp_reports_tab_campaigns',  array( $this, 'campaigns' ) );
 
 	}
 
@@ -32,7 +32,7 @@ class AffWP_Reports_Admin {
 	 */
 	public function display() {
 
-		$active_tab = isset( $_GET[ 'tab' ] ) && array_key_exists( $_GET['tab'], $this->get_reports_tabs() ) ? $_GET[ 'tab' ] : 'referrals';
+		$active_tab = isset( $_GET[ 'tab' ] ) && array_key_exists( $_GET['tab'], $this->get_reports_tabs() ) ? $_GET[ 'tab' ] : 'affiliates';
 
 	?>
 		<div class="wrap">
@@ -81,11 +81,9 @@ class AffWP_Reports_Admin {
 
 		$tabs                = array();
 		$tabs['affiliates']  = __( 'Affiliates',  'affiliate-wp' );
-		$tabs['referrals']   = __( 'Referrals',  'affiliate-wp' );
-		$tabs['visits']      = __( 'Visits',     'affiliate-wp' );
-		$tabs['campaigns']   = __( 'Campaigns',  'affiliate-wp' );
-		// Registration to be located in Affiliates tab
-		// $tabs['registrations'] = __( 'Registrations', 'affiliate-wp' );
+		$tabs['referrals']   = __( 'Referrals',   'affiliate-wp' );
+		$tabs['visits']      = __( 'Visits',      'affiliate-wp' );
+		// $tabs['campaigns']   = __( 'Campaigns',   'affiliate-wp' );
 
 		return apply_filters( 'affwp_reports_tabs', $tabs );
 	}
@@ -110,6 +108,13 @@ class AffWP_Reports_Admin {
 	 * @return void
 	 */
 	public function referrals() {
+
+		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/reports/class-reports-referrals-list-table.php';
+		$referrals_list_table = new AffWP_Reports_Referrals_List_Table;
+		$referrals_list_table->prepare_items();
+
+		$graph = new Affiliate_WP_Referrals_Graph;
+		$graph->set( 'x_mode', 'time' );
 	?>
 		<table id="affwp_total_earnings" class="affwp_table">
 
@@ -190,20 +195,24 @@ class AffWP_Reports_Admin {
 		</table>
 
 		<?php
-		$graph = new Affiliate_WP_Referrals_Graph;
-		$graph->set( 'x_mode', 'time' );
+
 		$graph->display();
+		$referrals_list_table->display();
 
 	}
 
 
 	/**
-	 * Display the visits reports tab
+	 * Display the Visits reports tab.
 	 *
 	 * @since 1.9
 	 * @return void
 	 */
 	public function visits() {
+
+		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/reports/class-reports-visits-list-table.php';
+		$visits_list_table = new AffWP_Reports_Visits_List_Table;
+		$visits_list_table->prepare_items();
 
 		$graph = new Affiliate_WP_Visits_Graph;
 		$graph->set( 'x_mode',   'time' );
@@ -236,27 +245,27 @@ class AffWP_Reports_Admin {
 
 		</table>
 	<?php
+
 		$graph->display();
+		$visits_list_table->display();
 
 	}
 
-
 	/**
-	 * Display the affiliate registration reports tab
+	 * Display the Campaigns reports tab.
 	 *
 	 * @since 1.9
 	 * @return void
 	 */
-	public function registrations() {
+	// public function campaigns() {
 
-		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/reports/class-registrations-graph.php';
+	// 	require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/reports/class-campaigns-list-table.php';
 
-		$graph = new Affiliate_WP_Registrations_Graph;
-		$graph->set( 'x_mode',   'time' );
-		$graph->set( 'currency', false  );
-		$graph->display();
+	// 	$campaigns_list_table = new AffWP_Reports_Campaigns_List_Table;
+	// 	$campaigns_list_table->prepare_items();
+	// 	$campaigns_list_table->display();
 
-	}
+	// }
 
 
 }

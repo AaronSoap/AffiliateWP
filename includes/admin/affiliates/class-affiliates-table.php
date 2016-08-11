@@ -25,7 +25,7 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  *
  * @since 1.0
  */
-abstract class AffWP_Affiliates_Table extends WP_List_Table {
+class AffWP_Affiliates_Table extends WP_List_Table {
 
 	/**
 	 * Default number of items to show per page
