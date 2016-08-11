@@ -83,30 +83,41 @@ class CLI extends \AffWP\Object\CLI {
 	 * : Referral ID or comma-separated list of referral IDs to associate with the payout.
 	 *
 	 * * Pass 'all' to generate a payout for all unpaid referrals for this affiliate.
-	 * * Pass 'dates' and use --date or --start_date / --end_date to generate a payout based on referral dates.
+	 * * Pass 'filter' to filter referrals using the amount and/or date options.
 	 *
 	 * [--amount=<number>]
-	 * : Payout amount.
+	 * : Payout amount. Intended to be used in conjunction with the 'filter' option for the <referrals> argument.
 	 *
 	 * [--amount_compare=<operator>]
 	 * : Comparison operator to use in conjunction with --amount. Accepts '>', '<', '>=', '<=', '=', or '!='.
 	 *
+	 * Intended to be used in conjunction with the 'filter' option for the <referrals> argument.
+	 *
 	 * [--amount_min=<number>]
 	 * : Minimum amount to search for. --amount_max must also be passed for this to work.
+	 *
+	 * Intended to be used in conjunction with the 'filter' option for the <referrals> argument.
 	 *
 	 * [--amount_max=<number>]
 	 * : Maximum amount to search for. --amount_min must also be passed for this to work.
 	 *
+	 * Intended to be used in conjunction with the 'filter' option for the <referrals> argument.
+	 *
 	 * [--date=<date>]
-	 * : Date to pay out referrals for. Intended to be used in place of --date_start and/or --date_end.
+	 * : Date to pay out referrals for. Intended to be used in conjunction with the 'filter' option for the
+	 * <referrals> argument. Should be used in place of --date_start and/or --date_end.
 	 *
 	 * [--start_date=<date>]
 	 * : Starting date to pay out referrals for. Can be used without --date_end to pay out referrals
 	 * on or after this date.
 	 *
+	 * Intended to be used in conjunction with the 'filter' option for the <referrals> argument.
+	 *
 	 * [--end_date=<date>]
 	 * : Starting date to pay out referrals for. Can be used without --date_start to pay out referrals
 	 * on or before this date.
+	 *
+	 * Intended to be used in conjunction with the 'filter' option for the <referrals> argument.
 	 *
 	 * [--method=<method>]
 	 * : Payout method. Default empty.
@@ -149,21 +160,9 @@ class CLI extends \AffWP\Object\CLI {
 		$data = array();
 
 		// Grab flag values.
-		$data['amount']         = Utils\get_flag_value( $assoc_args, 'amount'        , ''     );
-		$data['amount_compare'] = Utils\get_flag_value( $assoc_args, 'amount_compare', ''     );
 		$data['payout_method']  = Utils\get_flag_value( $assoc_args, 'method'        , ''     );
 		$data['status']         = Utils\get_flag_value( $assoc_args, 'status'        , 'paid' );
 		$data['affiliate_id']   = $affiliate->ID;
-
-		$amount_min = Utils\get_flag_value( $assoc_args, 'amount_min', 0 );
-		$amount_max = Utils\get_flag_value( $assoc_args, 'amount_max', 0 );
-
-		if ( empty( $data['amount'] ) && ( ! empty( $amount_min ) && ! empty( $amount_max ) ) ) {
-			$data['amount'] = array(
-				'min' => $amount_min,
-				'max' => $amount_max
-			);
-		}
 
 		$referral_args = array(
 			'number'       => - 1,
@@ -174,7 +173,28 @@ class CLI extends \AffWP\Object\CLI {
 
 		if ( 'all' === $args[1] ) {
 			$data['referrals'] = affiliate_wp()->referrals->get_referrals( $referral_args );
-		} elseif ( 'dates' === $args[1] ) {
+		} elseif ( 'filter' === $args[1] ) {
+			// Amounts filters.
+			$amount         = Utils\get_flag_value( $assoc_args, 'amount',         '' );
+			$amount_compare = Utils\get_flag_value( $assoc_args, 'amount_compare', '' );
+			$amount_min     = Utils\get_flag_value( $assoc_args, 'amount_min',     0  );
+			$amount_max     = Utils\get_flag_value( $assoc_args, 'amount_max',     0  );
+
+			if ( ! empty( $amount_min ) && ! empty( $amount_max ) ) {
+				$referral_args['amount'] = array(
+					'min' => $amount_min,
+					'max' => $amount_max
+				);
+			} elseif ( ! empty( $amount ) ) {
+
+				$referral_args['amount'] = $amount;
+
+				if ( ! empty( $amount_compare ) ) {
+					$referral_args['amount_compare'] = $amount_compare
+				}
+			}
+
+			// Date filters.
 			$date       = Utils\get_flag_value( $assoc_args, 'date',       '' );
 			$start_date = Utils\get_flag_value( $assoc_args, 'start_date', '' );
 			$end_date   = Utils\get_flag_value( $assoc_args, 'end_date',   '' );
@@ -192,8 +212,8 @@ class CLI extends \AffWP\Object\CLI {
 				$referral_args['date'] = $date;
 			}
 
-			if ( empty( $referral_args['date'] ) ) {
-				\WP_CLI::error( __( 'Date parameters must be defined to retrieve referrals by date.', 'affiliate-wp' ) );
+			if ( empty( $referral_args['date'] ) || ( empty( $referral_args['amount'] ) ) ) {
+				\WP_CLI::error( __( 'Date or amount parameters must be defined to retrieve referrals using the "filter" option.', 'affiliate-wp' ) );
 			}
 
 			$data['referrals'] = affiliate_wp()->referrals->get_referrals( $referral_args );
