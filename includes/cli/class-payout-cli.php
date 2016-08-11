@@ -144,11 +144,11 @@ class CLI extends \AffWP\Object\CLI {
 		$data['affiliate_id']   = $affiliate->ID;
 
 		if ( 'all' === $args[1] ) {
-			$data['referrals'] = affiliate_wp()->referrals->get_referrals( array(
+			$data['referrals'] = wp_list_pluck( affiliate_wp()->referrals->get_referrals( array(
 				'number'       => -1,
 				'status'       => 'unpaid',
 				'affiliate_id' => $affiliate->ID
-			) );
+			) ), 'referral_id' );
 		} elseif ( false !== strpos( $args[1], ',' ) ) {
 			$data['referrals'] = wp_parse_id_list( $args[1] );
 		} else {
