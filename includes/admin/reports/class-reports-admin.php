@@ -98,7 +98,7 @@ class AffWP_Reports_Admin {
 	 */
 	public function affiliates() {
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/reports/class-reports-affiliates-list-table.php';
-		$affiliate_list_table = new AffWP_Reports_Affiliate_List_Table;
+		$affiliate_list_table = new AffWP_Reports_Affiliates_List_Table;
 		$affiliate_list_table->prepare_items();
 		$affiliate_list_table->display();
 	}
