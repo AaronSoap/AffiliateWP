@@ -168,14 +168,12 @@ class CLI extends \AffWP\Object\CLI {
 		$referral_args = array(
 			'number'       => - 1,
 			'status'       => 'unpaid',
-			'affiliate_id' => $affiliate->ID
+			'affiliate_id' => $affiliate->ID,
+			'fields'       => 'ids',
 		);
 
 		if ( 'all' === $args[1] ) {
-			$data['referrals'] = wp_list_pluck(
-				affiliate_wp()->referrals->get_referrals( $referral_args ),
-				'referral_id'
-			);
+			$data['referrals'] = affiliate_wp()->referrals->get_referrals( $referral_args );
 		} elseif ( 'dates' === $args[1] ) {
 			$date       = Utils\get_flag_value( $assoc_args, 'date',       '' );
 			$start_date = Utils\get_flag_value( $assoc_args, 'start_date', '' );
@@ -198,10 +196,7 @@ class CLI extends \AffWP\Object\CLI {
 				\WP_CLI::error( __( 'Date parameters must be defined to retrieve referrals by date.', 'affiliate-wp' ) );
 			}
 
-			$data['referrals'] = wp_list_pluck(
-				affiliate_wp()->referrals->get_referrals( $referral_args ),
-				'referral_id'
-			);
+			$data['referrals'] = affiliate_wp()->referrals->get_referrals( $referral_args );
 		} elseif ( false !== strpos( $args[1], ',' ) ) {
 			$data['referrals'] = wp_parse_id_list( $args[1] );
 		} else {
