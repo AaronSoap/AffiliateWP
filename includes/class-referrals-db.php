@@ -250,6 +250,8 @@ class Affiliate_WP_Referrals_DB extends Affiliate_WP_DB  {
 			'offset'       => 0,
 			'referral_id'  => 0,
 			'affiliate_id' => 0,
+			'amount'       => 0,
+			'amount_compare' => '=',
 			'reference'    => '',
 			'context'      => '',
 			'campaign'     => '',
@@ -292,6 +294,36 @@ class Affiliate_WP_Referrals_DB extends Affiliate_WP_DB  {
 
 			$where .= "WHERE `affiliate_id` IN( {$affiliate_ids} ) ";
 
+		}
+
+		// Amount.
+		if ( ! empty( $args['amount'] ) ) {
+
+			$amount = $args['amount'];
+
+			$where .= empty( $where ) ? " WHERE" : " AND";
+
+			if ( is_array( $amount ) && ! empty( $amount['min'] ) && ! empty( $amount['max'] ) ) {
+
+				$minimum = absint( $amount['min'] );
+				$maximum = absint( $amount['max'] );
+
+				$where .= " `amount` BETWEEN {$minimum} AND {$maximum}";
+			} else {
+
+				$amount  = absint( $amount );
+				$compare = '=';
+
+				if ( ! empty( $args['amount_compare'] ) ) {
+					$compare = $args['amount_compare'];
+
+					if ( ! in_array( $compare, array( '>', '<', '>=', '<=', '=', '!=' ) ) ) {
+						$compare = '=';
+					}
+				}
+
+				$where .= " `amount` {$compare} {$amount}";
+			}
 		}
 
 		if( ! empty( $args['status'] ) ) {
