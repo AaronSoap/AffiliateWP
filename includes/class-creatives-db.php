@@ -105,6 +105,7 @@ class Affiliate_WP_Creatives_DB extends Affiliate_WP_DB {
 			'status'  => '',
 			'orderby' => $this->primary_key,
 			'order'   => 'ASC',
+			'fields'  => '',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -137,6 +138,16 @@ class Affiliate_WP_Creatives_DB extends Affiliate_WP_DB {
 		$args['orderby'] = $orderby;
 		$args['order']   = $order;
 
+		$fields = "*";
+
+		if ( ! empty( $args['fields'] ) ) {
+			switch ( $args['fields'] ) {
+				case 'ids':
+					$fields = "$this->primary_key";
+					break;
+			}
+		}
+
 		$key = ( true === $count ) ? md5( 'affwp_creatives_count' . serialize( $args ) ) : md5( 'affwp_creatives_' . serialize( $args ) );
 
 		$last_changed = wp_cache_get( 'last_changed', $this->cache_group );
@@ -154,6 +165,19 @@ class Affiliate_WP_Creatives_DB extends Affiliate_WP_DB {
 
 				$results = absint( $wpdb->get_var( "SELECT COUNT({$this->primary_key}) FROM {$this->table_name} {$where};" ) );
 
+			} elseif ( 'ids' === $args['fields'] ) {
+
+				$results = $wpdb->get_col(
+					$wpdb->prepare(
+						"SELECT {$fields} FROM {$this->table_name} {$where} ORDER BY {$orderby} {$order} LIMIT %d, %d;",
+						absint( $args['offset'] ),
+						absint( $args['number'] )
+					)
+				);
+
+				// Ensure returned IDs are integers.
+				$results = array_map( 'intval', $results );
+
 			} else {
 
 				$results = $wpdb->get_results(
@@ -164,12 +188,9 @@ class Affiliate_WP_Creatives_DB extends Affiliate_WP_DB {
 					)
 				);
 
+				// Convert to AffWP\Creative objects.
+				$results = array_map( 'affwp_get_creative', $results );
 			}
-		}
-
-		// Convert to AffWP\Creative objects.
-		if ( is_array( $results ) ) {
-			$results = array_map( 'affwp_get_creative', $results );
 		}
 
 		wp_cache_add( $cache_key, $results, $this->cache_group, HOUR_IN_SECONDS );

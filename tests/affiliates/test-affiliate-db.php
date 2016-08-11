@@ -6,7 +6,7 @@
  * @group database
  * @group affiliates
  */
-class Affiliate_DB_Tests extends WP_UnitTestCase {
+class Affiliate_DB_Tests extends AffiliateWP_UnitTestCase {
 
 	/**
 	 * Test users.
@@ -446,6 +446,33 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		$this->assertEquals( $this->affiliates[1], $results[0]->affiliate_id );
 		$this->assertEquals( $this->affiliates[0], $results[1]->affiliate_id );
 		$this->assertEquals( $this->affiliates[2], $results[2]->affiliate_id );
+	}
+
+	/**
+	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
+	 */
+	public function test_get_affiliates_fields_ids_should_return_an_array_of_ids_only() {
+		$affiliates = $this->affwp->affiliate->create_many( 3 );
+
+		$results = affiliate_wp()->affiliates->get_affiliates( array(
+			'fields' => 'ids'
+		) );
+
+		$this->assertEqualSets( $affiliates, $results );
+	}
+
+	/**
+	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
+	 */
+	public function test_get_affiliates_invalid_fields_arg_should_return_regular_Affiliate_object_results() {
+		$affiliates = $this->affwp->affiliate->create_many( 3 );
+		$affiliates = array_map( 'affwp_get_affiliate', $affiliates );
+
+		$results = affiliate_wp()->affiliates->get_affiliates( array(
+			'fields' => 'foo'
+		) );
+
+		$this->assertEqualSets( $affiliates, $results );
 	}
 
 	/**

@@ -340,7 +340,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 		 * @param string                  $$value Formatted payout amount.
 		 * @param \AffWP\Affiliate\Payout $payout Current payout object.
 		 */
-		return apply_filters( 'affwp_referral_table_amount', $value, $payout );
+		return apply_filters( 'affwp_payout_table_amount', $value, $payout );
 	}
 
 	/**

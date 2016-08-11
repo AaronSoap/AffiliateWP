@@ -6,7 +6,7 @@
  * @group database
  * @group referrals
  */
-class Referrals_DB_Tests extends WP_UnitTestCase {
+class Referrals_DB_Tests extends AffiliateWP_UnitTestCase {
 
 	/**
 	 * Test affiliates.
@@ -66,6 +66,33 @@ class Referrals_DB_Tests extends WP_UnitTestCase {
 		$results = affiliate_wp()->referrals->get_referrals( array(), $count = true );
 
 		$this->assertTrue( is_numeric( $results ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Referrals_DB::get_referrals()
+	 */
+	public function test_get_referrals_fields_ids_should_return_an_array_of_ids_only() {
+		$referrals = $this->affwp->referral->create_many( 3 );
+
+		$results = affiliate_wp()->referrals->get_referrals( array(
+			'fields' => 'ids'
+		) );
+
+		$this->assertEqualSets( $referrals, $results );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Referrals_DB::get_referrals()
+	 */
+	public function test_get_referrals_invalid_fields_arg_should_return_regular_Referral_object_results() {
+		$referrals = $this->affwp->referral->create_many( 3 );
+		$referrals = array_map( 'affwp_get_referral', $referrals );
+
+		$results = affiliate_wp()->referrals->get_referrals( array(
+			'fields' => 'foo'
+		) );
+
+		$this->assertEqualSets( $referrals, $results );
 	}
 
 	/**
