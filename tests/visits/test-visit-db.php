@@ -6,7 +6,7 @@
  * @group database
  * @group visits
  */
-class Visits_DB_Tests extends WP_UnitTestCase {
+class Visits_DB_Tests extends AffiliateWP_UnitTestCase {
 
 	/**
 	 * Test affiliates.
@@ -56,6 +56,34 @@ class Visits_DB_Tests extends WP_UnitTestCase {
 		$results = affiliate_wp()->visits->get_visits( array(), $count = true );
 
 		$this->assertTrue( is_numeric( $results ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Visits_DB::get_visits()
+	 */
+	public function test_get_visits_fields_ids_should_return_an_array_of_ids_only() {
+		$visits = $this->affwp->visit->create_many( 3 );
+
+		$results = affiliate_wp()->visits->get_visits( array(
+			'fields' => 'ids'
+		) );
+
+		$this->assertEqualSets( $visits, $results );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Visits_DB::get_visits()
+	 */
+	public function test_get_visits_invalid_fields_arg_should_return_regular_Visit_object_results() {
+		$visits = $this->affwp->visit->create_many( 3 );
+		$visits = array_map( 'affwp_get_visit', $visits );
+
+		$results = affiliate_wp()->visits->get_visits( array(
+			'fields' => 'foo'
+		) );
+
+		$this->assertEqualSets( $visits, $results );
+
 	}
 
 	/**

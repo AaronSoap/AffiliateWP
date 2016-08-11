@@ -136,7 +136,8 @@ class Affiliate_WP_DB_Affiliates extends Affiliate_WP_DB {
 			'affiliate_id' => 0,
 			'status'       => '',
 			'order'        => 'DESC',
-			'orderby'      => 'affiliate_id'
+			'orderby'      => 'affiliate_id',
+			'fields'       => '',
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -316,6 +317,16 @@ class Affiliate_WP_DB_Affiliates extends Affiliate_WP_DB {
 		$args['orderby'] = $orderby;
 		$args['order']   = $order;
 
+		$fields = "*";
+
+		if ( ! empty( $args['fields'] ) ) {
+			switch ( $args['fields'] ) {
+				case 'ids':
+					$fields = "$this->primary_key";
+					break;
+			}
+		}
+
 		$key = ( true === $count ) ? md5( 'affwp_affiliates_count' . serialize( $args ) ) : md5( 'affwp_affiliates_' . serialize( $args ) );
 
 		$last_changed = wp_cache_get( 'last_changed', $this->cache_group );
@@ -333,6 +344,19 @@ class Affiliate_WP_DB_Affiliates extends Affiliate_WP_DB {
 
 				$results = absint( $wpdb->get_var( "SELECT COUNT({$this->primary_key}) FROM {$this->table_name} {$where};" ) );
 
+			} elseif ( 'ids' === $args['fields'] ) {
+
+				$results = $wpdb->get_col(
+					$wpdb->prepare(
+						"SELECT {$fields} FROM {$this->table_name} {$join} {$where} ORDER BY {$orderby} {$order} LIMIT %d, %d;",
+						absint( $args['offset'] ),
+						absint( $args['number'] )
+					)
+				);
+
+				// Ensure returned IDs are integers.
+				$results = array_map( 'intval', $results );
+
 			} else {
 
 				$results = $wpdb->get_results(
@@ -343,12 +367,9 @@ class Affiliate_WP_DB_Affiliates extends Affiliate_WP_DB {
 					)
 				);
 
+				// Convert to AffWP\Affiliate objects.
+				$results = array_map( 'affwp_get_affiliate', $results );
 			}
-		}
-
-		// Convert to AffWP\Affiliate objects.
-		if ( is_array( $results ) ) {
-			$results = array_map( 'affwp_get_affiliate', $results );
 		}
 
 		wp_cache_add( $cache_key, $results, $this->cache_group, HOUR_IN_SECONDS );

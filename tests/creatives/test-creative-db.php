@@ -6,7 +6,7 @@
  * @group database
  * @group creatives
  */
-class Creatives_DB_Tests extends WP_UnitTestCase {
+class Creatives_DB_Tests extends AffiliateWP_UnitTestCase {
 
 	/**
 	 * Test creatives.
@@ -21,7 +21,9 @@ class Creatives_DB_Tests extends WP_UnitTestCase {
 	 */
 	public function tearDown() {
 		// Reset fixtures.
-		$this->creatives = array();
+		foreach ( $this->creatives as $creative ) {
+			affwp_delete_creative( $creative );
+		}
 
 		parent::tearDown();
 	}
@@ -47,6 +49,33 @@ class Creatives_DB_Tests extends WP_UnitTestCase {
 		$results = affiliate_wp()->creatives->get_creatives( array(), $count = true );
 
 		$this->assertTrue( is_numeric( $results ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Creatives_DB::get_creatives()
+	 */
+	public function test_get_creatives_fields_ids_should_return_an_array_of_ids_only() {
+		$creatives = $this->affwp->creative->create_many( 3 );
+
+		$results = affiliate_wp()->creatives->get_creatives( array(
+			'fields' => 'ids'
+		) );
+
+		$this->assertEqualSets( $creatives, $results );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Creatives_DB::get_creatives()
+	 */
+	public function test_get_creatives_invalid_fields_arg_should_return_regular_Creative_object_results() {
+		$creatives = $this->affwp->creative->create_many( 3 );
+		$creatives = array_map( 'affwp_get_creative', $creatives );
+
+		$results = affiliate_wp()->creatives->get_creatives( array(
+			'fields' => 'foo'
+		) );
+
+		$this->assertEqualSets( $creatives, $results );
 	}
 
 	/**
