@@ -115,6 +115,18 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	<?php
 	}
 
+
+	/**
+	 * Dynamic search filters for the list table.
+	 *
+	 * @access  public
+	 * @since  1.9
+	 * @return void
+	 */
+	public function search_filters() {
+
+	}
+
 	/**
 	 * Retrieve the view types
 	 *
@@ -171,7 +183,7 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 		 * @param  $columns The columns for this list table.
 		 * @since  1.9
 		 */
-		return apply_filters( 'affwp_affiliate_table_columns', $columns );
+		return apply_filters( 'affwp_reports_affiliate_table_columns', $columns );
 	}
 
 	/**
@@ -215,7 +227,7 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 				break;
 		}
 
-		return apply_filters( 'affwp_affiliate_table_' . $column_name, $value );
+		return apply_filters( 'affwp_reports_affiliate_table_' . $column_name, $value );
 	}
 
 	/**
@@ -237,14 +249,14 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 			$value = __( '(user deleted)', 'affiliate-wp' );
 		}
 
-		return apply_filters( 'affwp_affiliate_table_name', $value, $affiliate );
+		return apply_filters( 'affwp_reports_affiliate_table_name', $value, $affiliate );
 	}
 
 	/**
 	 * Render the Username Column
 	 *
 	 * @access public
-	 * @since 1.8
+	 * @since 1.9
 	 * @param array $affiliate Contains all the data of the affiliate
 	 * @return string Data shown in the Username column
 	 */
@@ -260,7 +272,7 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 			$value = __( '(user deleted)', 'affiliate-wp' );
 		}
 
-		return apply_filters( 'affwp_affiliate_table_username', $value, $affiliate );
+		return apply_filters( 'affwp_reports_affiliate_table_username', $value, $affiliate );
 
 	}
 
@@ -286,7 +298,7 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	 */
 	function column_earnings( $affiliate ) {
 		$value = affwp_get_affiliate_earnings( $affiliate->affiliate_id, true );
-		return apply_filters( 'affwp_affiliate_table_earnings', $value, $affiliate );
+		return apply_filters( 'affwp_reports_affiliate_table_earnings', $value, $affiliate );
 	}
 
 	/**
@@ -299,7 +311,7 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	 */
 	function column_rate( $affiliate ) {
 		$value = affwp_get_affiliate_rate( $affiliate->affiliate_id, true );
-		return apply_filters( 'affwp_affiliate_table_rate', $value, $affiliate );
+		return apply_filters( 'affwp_reports_affiliate_table_rate', $value, $affiliate );
 	}
 
 
@@ -307,7 +319,7 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	 * Render the unpaid referrals column
 	 *
 	 * @access public
-	 * @since 1.7.5
+	 * @since 1.9
 	 * @param array $affiliate Contains all the data for the unpaid referrals column
 	 * @return string unpaid referrals link
 	 */
@@ -315,7 +327,7 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 		$unpaid_count = affiliate_wp()->referrals->unpaid_count( '', $affiliate->affiliate_id );
 
 		$value = '<a href="' . admin_url( 'admin.php?page=affiliate-wp-referrals&affiliate_id=' . $affiliate->affiliate_id . '&status=unpaid' ) . '">' . $unpaid_count . '</a>';
-		return apply_filters( 'affwp_affiliate_table_unpaid', $value, $affiliate );
+		return apply_filters( 'affwp_reports_affiliate_table_unpaid', $value, $affiliate );
 	}
 
 
@@ -329,7 +341,7 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	 */
 	function column_referrals( $affiliate ) {
 		$value = '<a href="' . admin_url( 'admin.php?page=affiliate-wp-referrals&affiliate_id=' . $affiliate->affiliate_id . '&status=paid' ) . '">' . $affiliate->referrals . '</a>';
-		return apply_filters( 'affwp_affiliate_table_referrals', $value, $affiliate );
+		return apply_filters( 'affwp_reports_affiliate_table_referrals', $value, $affiliate );
 	}
 
 	/**
@@ -342,15 +354,15 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	 */
 	function column_visits( $affiliate ) {
 		$value = '<a href="' . admin_url( 'admin.php?page=affiliate-wp-visits&affiliate=' . $affiliate->affiliate_id ) . '">' . affwp_get_affiliate_visit_count( $affiliate->affiliate_id ) . '</a>';
-		return apply_filters( 'affwp_affiliate_table_visits', $value, $affiliate );
+		return apply_filters( 'affwp_reports_affiliate_table_visits', $value, $affiliate );
 	}
 
 	/**
 	 * Render the registered column
 	 *
 	 * @access public
-	 * @since  1.9
-	 * @param  array $affiliate Contains all the data for the registered column
+	 * @since 1.9
+	 * @param array $affiliate Contains all the data for the registered column
 	 * @return string Date of user registration
 	 */
 	function column_registered( $affiliate ) {
@@ -366,7 +378,7 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 		 *
 		 * @since  1.9
 		 */
-		return apply_filters( 'affwp_affiliate_table_registered', $value, $affiliate );
+		return apply_filters( 'affwp_reports_affiliate_table_registered', $value, $affiliate );
 	}
 
 	/**
@@ -379,32 +391,18 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	 */
 	function column_actions( $affiliate ) {
 
-		$row_actions['reports'] = '<a href="' . esc_url( add_query_arg( array( 'affwp_notice' => false, 'affiliate_id' => $affiliate->affiliate_id, 'action' => 'view_affiliate' ) ) ) . '">' . __( 'Reports', 'affiliate-wp' ) . '</a>';
-		$row_actions['edit'] = '<a href="' . esc_url( add_query_arg( array( 'affwp_notice' => false, 'action' => 'edit_affiliate', 'affiliate_id' => $affiliate->affiliate_id ) ) ) . '">' . __( 'Edit', 'affiliate-wp' ) . '</a>';
+		$row_actions['export'] = '<a href="' . esc_url( add_query_arg( array( 'affwp_notice' => false, 'affiliate_id' => $affiliate->affiliate_id, 'action' => 'export_affiliate' ) ) ) . '">' . __( 'Export', 'affiliate-wp' ) . '</a>';
 
-		if ( strtolower( $affiliate->status ) == 'active' ) {
-			$row_actions['deactivate'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'affwp_notice' => 'affiliate_deactivated', 'action' => 'deactivate', 'affiliate_id' => $affiliate->affiliate_id ) ), 'affiliate-nonce' ) . '">' . __( 'Deactivate', 'affiliate-wp' ) . '</a>';
-		} elseif( strtolower( $affiliate->status ) == 'pending' ) {
-			$row_actions['review'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'affwp_notice' => false, 'action' => 'review_affiliate', 'affiliate_id' => $affiliate->affiliate_id ) ), 'affiliate-nonce' ) . '">' . __( 'Review', 'affiliate-wp' ) . '</a>';
-			$row_actions['accept'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'affwp_notice' => 'affiliate_accepted', 'action' => 'accept', 'affiliate_id' => $affiliate->affiliate_id ) ), 'affiliate-nonce' ) . '">' . __( 'Accept', 'affiliate-wp' ) . '</a>';
-			$row_actions['reject'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'affwp_notice' => 'affiliate_rejected', 'action' => 'reject', 'affiliate_id' => $affiliate->affiliate_id ) ), 'affiliate-nonce' ) . '">' . __( 'Reject', 'affiliate-wp' ) . '</a>';
-		} else {
-			$row_actions['activate'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'affwp_notice' => 'affiliate_activated', 'action' => 'activate', 'affiliate_id' => $affiliate->affiliate_id ) ), 'affiliate-nonce' ) . '">' . __( 'Activate', 'affiliate-wp' ) . '</a>';
-		}
-
-		$row_actions['delete'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'action' => 'delete', 'affiliate_id' => $affiliate->affiliate_id, 'affwp_notice' => false ) ), 'affiliate-nonce' ) . '">' . __( 'Delete', 'affiliate-wp' ) . '</a>';
-
-		$row_actions = apply_filters( 'affwp_affiliate_row_actions', $row_actions, $affiliate );
+		$row_actions = apply_filters( 'affwp_reports_affiliate_row_actions', $row_actions, $affiliate );
 
 		return $this->row_actions( $row_actions, true );
 
 	}
 
-
 	/**
 	 * Message to be displayed when there are no items
 	 *
-	 * @since 1.7.2
+	 * @since 1.9
 	 * @access public
 	 */
 	public function no_items() {
@@ -420,14 +418,10 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	 */
 	public function get_bulk_actions() {
 		$actions = array(
-			'accept'     => __( 'Accept', 'affiliate-wp' ),
-			'reject'     => __( 'Reject', 'affiliate-wp' ),
-			'activate'   => __( 'Activate', 'affiliate-wp' ),
-			'deactivate' => __( 'Deactivate', 'affiliate-wp' ),
-			'delete'     => __( 'Delete', 'affiliate-wp' )
+			'export'     => __( 'Export', 'affiliate-wp' )
 		);
 
-		return apply_filters( 'affwp_affiliates_bulk_actions', $actions );
+		return apply_filters( 'affwp_reports_affiliates_bulk_actions', $actions );
 	}
 
 	/**
@@ -461,20 +455,8 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 
 		foreach ( $ids as $id ) {
 
-			if ( 'accept' === $this->current_action() ) {
-				affwp_set_affiliate_status( $id, 'active' );
-			}
-
-			if ( 'reject' === $this->current_action() ) {
-				affwp_set_affiliate_status( $id, 'rejected' );
-			}
-
-			if ( 'activate' === $this->current_action() ) {
-				affwp_set_affiliate_status( $id, 'active' );
-			}
-
-			if ( 'deactivate' === $this->current_action() ) {
-				affwp_set_affiliate_status( $id, 'inactive' );
+			if ( 'export' === $this->current_action() ) {
+				$this->export( $id );
 			}
 
 		}
@@ -482,7 +464,20 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Retrieve the discount code counts
+	 * Export data to .csv from the list table.
+	 *
+	 * @since  1.9
+	 *
+	 * @return void
+	 *
+	 * @todo
+	 */
+	public function export() {
+
+	}
+
+	/**
+	 * Retrieve the status counts for affiliates.
 	 *
 	 * @access public
 	 * @since 1.9
@@ -532,10 +527,10 @@ class AffWP_Reports_Affiliates_List_Table extends WP_List_Table {
 	 *
 	 * @access public
 	 * @since 1.9
-	 * @uses AffWP_Affiliates_Table::get_columns()
-	 * @uses AffWP_Affiliates_Table::get_sortable_columns()
-	 * @uses AffWP_Affiliates_Table::process_bulk_action()
-	 * @uses AffWP_Affiliates_Table::affiliate_data()
+	 * @uses AffWP_Reports_Affiliates_List_Table::get_columns()
+	 * @uses AffWP_Reports_Affiliates_List_Table::get_sortable_columns()
+	 * @uses AffWP_Reports_Affiliates_List_Table::process_bulk_action()
+	 * @uses AffWP_Reports_Affiliates_List_Table::affiliate_data()
 	 * @uses WP_List_Table::get_pagenum()
 	 * @uses WP_List_Table::set_pagination_args()
 	 * @return void
