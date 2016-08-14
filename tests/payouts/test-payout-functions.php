@@ -68,28 +68,28 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_payout()
+	 * @covers ::affwp_get_payout()
 	 */
 	public function test_get_payout_with_an_invalid_payout_id_should_return_false() {
 		$this->assertFalse( affwp_get_payout( 0 ) );
 	}
 
 	/**
-	 * @covers affwp_get_payout()
+	 * @covers ::affwp_get_payout()
 	 */
 	public function test_get_payout_with_a_valid_payout_id_should_return_a_payout_object() {
 		$this->assertInstanceOf( 'AffWP\Affiliate\Payout', affwp_get_payout( self::$payouts[0] ) );
 	}
 
 	/**
-	 * @covers affwp_get_payout()
+	 * @covers ::affwp_get_payout()
 	 */
 	public function test_get_payout_with_an_invalid_payout_object_should_return_false() {
 		$this->assertFalse( affwp_get_payout( new \stdClass() ) );
 	}
 
 	/**
-	 * @covers affwp_get_payout()
+	 * @covers ::affwp_get_payout()
 	 */
 	public function test_get_payout_with_a_valid_payout_object_should_return_a_payout_object() {
 		$payout = affwp_get_payout( self::$payouts[0] );
@@ -98,7 +98,7 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_add_payout()
+	 * @covers ::affwp_add_payout()
 	 */
 	public function test_add_payout_without_affiliate_id_should_return_false() {
 		$this->assertFalse( affwp_add_payout( array(
@@ -107,7 +107,7 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_add_payout()
+	 * @covers ::affwp_add_payout()
 	 */
 	public function test_add_payout_with_empty_referrals_should_return_false() {
 		$this->assertFalse( affwp_add_payout( array(
@@ -116,7 +116,7 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_add_payout()
+	 * @covers ::affwp_add_payout()
 	 */
 	public function test_add_payout_should_return_payout_id_on_success() {
 		$payout = affwp_add_payout( array(
@@ -133,21 +133,21 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_delete_payout()
+	 * @covers ::affwp_delete_payout()
 	 */
 	public function test_delete_payout_should_return_false_if_invalid_payout_id() {
 		$this->assertFalse( affwp_delete_payout( 0 ) );
 	}
 
 	/**
-	 * @covers affwp_delete_payout()
+	 * @covers ::affwp_delete_payout()
 	 */
 	public function test_delete_payout_should_return_false_if_invalid_payout_object() {
 		$this->assertFalse( affwp_delete_payout( new \stdClass() ) );
 	}
 
 	/**
-	 * @covers affwp_delete_payout()
+	 * @covers ::affwp_delete_payout()
 	 */
 	public function test_delete_payout_should_return_true_if_payout_deleted_successfully() {
 		$payout = $this->factory->payout->create();
@@ -156,7 +156,7 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_payout_referrals()
+	 * @covers ::affwp_get_payout_referrals()
 	 */
 	public function test_get_payout_referrals_should_return_false_if_invalid_payout() {
 		$this->assertFalse( affwp_get_payout_referrals( 0 ) );
@@ -164,7 +164,7 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_payout_referrals()
+	 * @covers ::affwp_get_payout_referrals()
 	 */
 	public function test_get_payout_referrals_should_return_array_of_referral_objects() {
 		$payout_referrals = affwp_get_payout_referrals( self::$payouts[0] );
@@ -174,7 +174,7 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_payout_status_label()
+	 * @covers ::affwp_get_payout_status_label()
 	 */
 	public function test_get_payout_status_label_should_return_false_if_invalid_payout() {
 		$this->assertFalse( affwp_get_payout_status_label( 0 ) );
@@ -182,14 +182,14 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_payout_status_label()
+	 * @covers ::affwp_get_payout_status_label()
 	 */
 	public function test_get_payout_status_label_should_return_paid_status_by_default() {
 		$this->assertSame( 'Paid', affwp_get_payout_status_label( self::$payouts[0] ) );
 	}
 
 	/**
-	 * @covers affwp_get_payout_status_label()
+	 * @covers ::affwp_get_payout_status_label()
 	 */
 	public function test_get_payout_status_label_should_return_payout_status_label() {
 		$payout_id = $this->factory->payout->create( array(
@@ -203,7 +203,7 @@ class Tests extends UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_payout_status_label()
+	 * @covers ::affwp_get_payout_status_label()
 	 */
 	public function test_get_payout_status_label_should_return_paid_if_invalid_status() {
 		$payout_id = $this->factory->payout->create( array(
