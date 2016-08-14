@@ -150,7 +150,9 @@ class Tests extends UnitTestCase {
 	 * @covers affwp_delete_payout()
 	 */
 	public function test_delete_payout_should_return_true_if_payout_deleted_successfully() {
-		$this->assertTrue( affwp_delete_payout( $this->factory->payout->create() ) );
+		$payout = $this->factory->payout->create();
+
+		$this->assertTrue( affwp_delete_payout( $payout ) );
 	}
 
 	/**
