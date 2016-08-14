@@ -1,4 +1,5 @@
 <?php
+namespace AffWP\Tests;
 
 require_once dirname( __FILE__ ) . '/factory.php';
 
@@ -11,23 +12,34 @@ require_once dirname( __FILE__ ) . '/factory.php';
  *
  * All WordPress unit tests should inherit from this class.
  */
-class AffiliateWP_UnitTestCase extends WP_UnitTestCase {
+class UnitTestCase extends \WP_UnitTestCase {
 
 	function __get( $name ) {
-		if ( 'affwp' === $name ) {
+		if ( 'factory' === $name ) {
 			return self::affwp();
-		} else {
-			// Needed to ensure $this->factory still works for core objects.
-			return parent::__get( $name );
 		}
 	}
 
 	protected static function affwp() {
 		static $factory = null;
 		if ( ! $factory ) {
-			$factory = new AffWP_Factory();
+			$factory = new Factory();
 		}
 		return $factory;
 	}
 
+	/**
+	 * Helper to flush the $wp_roles global.
+	 */
+	public static function _flush_roles() {
+		/*
+		 * We want to make sure we're testing against the db, not just in-memory data
+		 * this will flush everything and reload it from the db
+		 */
+		unset( $GLOBALS['wp_user_roles'] );
+		global $wp_roles;
+		if ( is_object( $wp_roles ) ) {
+			$wp_roles->_init();
+		}
+	}
 }

@@ -1,24 +1,24 @@
 <?php
+namespace AffWP\Tests\Factory;
 
-class AffWP_Factory_For_Visits extends WP_UnitTest_Factory_For_Thing {
+class Visit extends \WP_UnitTest_Factory_For_Thing {
+
+	public static $affiliate_id;
 
 	function __construct( $factory = null ) {
 		parent::__construct( $factory );
 	}
 
 	function create_many( $count, $args = array(), $generation_definitions = null ) {
-		// Parent create_many() uses initial value of 1 and < $count.
-		$count = $count - 1;
-
 		return parent::create_many( $count, $args, $generation_definitions );
 	}
 
 	function create_object( $args ) {
-		$affiliate = new AffWP_Factory_For_Affiliates();
+		$affiliate = new Affiliate();
 
 		// Only create the associated affiliate if one wasn't supplied.
 		if ( empty( $args['affiliate_id'] ) ) {
-			$args['affiliate_id'] = $affiliate->create();
+			$args['affiliate_id'] = self::$affiliate_id = $affiliate->create();
 		}
 
 		return affiliate_wp()->visits->add( $args );
@@ -30,5 +30,9 @@ class AffWP_Factory_For_Visits extends WP_UnitTest_Factory_For_Thing {
 
 	function get_object_by_id( $visit_id ) {
 		return affwp_get_visit( $visit_id );
+	}
+
+	function cleanup() {
+		affwp_delete_affiliate( self::$affiliate_id );
 	}
 }

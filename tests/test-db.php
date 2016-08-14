@@ -1,86 +1,66 @@
 <?php
+namespace AffWP\Database;
+
+use AffWP\Tests\UnitTestCase;
+
 /**
  * Tests for Affiliate_WP_DB_Affiliates class
  *
  * @covers Affiliate_WP_DB
  * @group database
  */
-class AffiliateWP_DB_Tests extends WP_UnitTestCase {
+class Tests extends UnitTestCase {
 
 	/**
-	 * Test user ID.
+	 * Affiliate fixture.
 	 *
 	 * @access protected
 	 * @var int
+	 * @static
 	 */
-	protected $_user_id = 0;
+	protected static $affiliate_id = 0;
 
 	/**
-	 * Test affiliate ID.
+	 * Referral fixture.
 	 *
 	 * @access protected
 	 * @var int
+	 * @static
 	 */
-	protected $_affiliate_id = 0;
+	protected static $referral_id = 0;
 
 	/**
-	 * Tests referral ID.
-	 *
-	 * @access protected
-	 * @var int
+	 * Set up fixtures once.
 	 */
-	protected $_referral_id = 0;
+	public static function wpSetUpBeforeClass() {
+		self::$affiliate_id = parent::affwp()->affiliate->create();
 
-	/**
-	 * Test creative ID.
-	 *
-	 * @access protected
-	 * @var int
-	 */
-	protected $_creative_id = 0;
-
-	/**
-	 * Test visit ID.
-	 *
-	 * @access protected
-	 * @var int
-	 */
-	protected $_visit_id = 0;
-
-	/**
-	 * Set up.
-	 */
-	public function setUp() {
-		parent::setUp();
-
-		$this->_user_id = $this->factory->user->create();
-
-		$this->_affiliate_id = affwp_add_affiliate( array(
-			'user_id' => $this->_user_id
-		) );
-
-		$this->_referral_id = affwp_add_referral( array(
-			'affiliate_id' => $this->_affiliate_id
-		) );
-
-		$this->_creative_id = affwp_add_creative();
-
-		$this->_visit_id = affiliate_wp()->visits->add( array(
-			'affiliate_id' => $this->_affiliate_id
+		self::$referral_id = parent::affwp()->referral->create( array(
+			'affiliate_id' => self::$affiliate_id
 		) );
 	}
 
 	/**
-	 * Tear down.
+	 * Destroy fixtures.
 	 */
-	public function tearDown() {
-		wp_delete_user( $this->_user_id );
-		affwp_delete_affiliate( $this->_affiliate_id );
-		affwp_delete_referral( $this->_referral_id );
-		affwp_delete_creative( $this->_creative_id );
-		affwp_delete_visit( $this->_visit_id );
+	public static function wpTearDownAfterClass() {
+		$affiliates = affiliate_wp()->affiliates->get_affiliates( array(
+			'number' => -1,
+			'fields' => 'ids',
+		) );
 
-		parent::tearDown();
+		foreach ( $affiliates as $affiliate ) {
+			affwp_delete_affiliate( $affiliate );
+		}
+
+		$referrals = affiliate_wp()->referrals->get_referrals( array(
+			'number' => -1,
+			'fields' => 'ids',
+		) );
+
+		foreach ( $referrals as $referral ) {
+			affwp_delete_referral( $referrals );
+		}
 	}
 
 	/**
@@ -93,14 +73,17 @@ class AffiliateWP_DB_Tests extends WP_UnitTestCase {
 		$this->assertSame( "Couldn\'t be simpler", $description );
 
 		// Fire ->add() which fires ->insert().
-		$referral_id = affiliate_wp()->referrals->add( array(
-			'affiliate_id' => $this->_affiliate_id,
+		$referral_id = $this->factory->referral->create( array(
+			'affiliate_id' => self::$affiliate_id,
 			'description'  => $description
 		) );
 
 		$stored = affiliate_wp()->referrals->get_column( 'description', $referral_id );
 
 		$this->assertSame( wp_unslash( $description ), $stored );
+
+		// Clean up.
+		affwp_delete_referral( $referral_id );
 	}
 
 	/**
@@ -113,11 +96,11 @@ class AffiliateWP_DB_Tests extends WP_UnitTestCase {
 		$this->assertSame( "Couldn\'t be simpler", $description );
 
 		// Fire ->update_referral() which fires ->update()
-		affiliate_wp()->referrals->update_referral( $this->_referral_id, array(
+		$this->factory->referral->update_object( self::$referral_id, array(
 			'description' => $description
 		) );
 
-		$stored = affiliate_wp()->referrals->get_column( 'description', $this->_referral_id );
+		$stored = affiliate_wp()->referrals->get_column( 'description', self::$referral_id );
 
 		$this->assertSame( wp_unslash( $description ), $stored );
 	}

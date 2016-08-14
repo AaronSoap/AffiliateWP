@@ -1,5 +1,8 @@
 <?php
-use AffWP\Referral as Referral;
+namespace AffWP\Referral\Object;
+
+use AffWP\Tests\UnitTestCase;
+use AffWP\Referral;
 
 /**
  * Tests for AffWP\Referral
@@ -10,7 +13,7 @@ use AffWP\Referral as Referral;
  * @group referrals
  * @group objects
  */
-class AffWP_Referral_Tests extends WP_UnitTestCase {
+class Tests extends UnitTestCase {
 
 	/**
 	 * @covers AffWP\Object::get_instance()

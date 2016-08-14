@@ -1,17 +1,20 @@
 <?php
+namespace AffWP\Tests\Factory;
 
-class AffWP_Factory_For_Referrals extends WP_UnitTest_Factory_For_Thing {
+class Referral extends \WP_UnitTest_Factory_For_Thing {
+
+	protected static $affiliate_id;
 
 	function __construct( $factory = null ) {
 		parent::__construct( $factory );
 	}
 
 	function create_object( $args ) {
-		$affiliate = new AffWP_Factory_For_Affiliates();
+		$affiliate = new Affiliate();
 
 		// Only create the associated affiliate if one wasn't supplied.
 		if ( empty( $args['affiliate_id'] ) ) {
-			$args['affiliate_id'] = $affiliate->create();
+			$args['affiliate_id'] = self::$affiliate_id = $affiliate->create();
 		}
 
 		return affiliate_wp()->referrals->add( $args );
@@ -42,5 +45,14 @@ class AffWP_Factory_For_Referrals extends WP_UnitTest_Factory_For_Thing {
 	 */
 	function get_object_by_id( $referral_id ) {
 		return affwp_get_referral( $referral_id );
+	}
+
+	function cleanup( $referrals = array() ) {
+		if ( ! empty( $referrals ) ) {
+			foreach ( $referrals as $referral ) {
+				affwp_delete_referral( $referral );
+			}
+		}
+		affwp_delete_affiliate( self::$affiliate_id );
 	}
 }

@@ -1,5 +1,8 @@
 <?php
-use AffWP\Creative as Creative;
+namespace AffWP\Creative\Object;
+
+use AffWP\Tests\UnitTestCase;
+use AffWP\Creative;
 
 /**
  * Tests for AffWP\Creative
@@ -10,7 +13,7 @@ use AffWP\Creative as Creative;
  * @group creatives
  * @group objects
  */
-class AffWP_Creative_Tests extends WP_UnitTestCase {
+class Tests extends UnitTestCase {
 
 	/**
 	 * @covers AffWP\Object::get_instance()

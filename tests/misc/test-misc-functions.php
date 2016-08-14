@@ -1,11 +1,15 @@
 <?php
+namespace AffWP\Misc\Functions;
+
+use AffWP\Tests\UnitTestCase;
+
 /**
  * Tests for includes/misc-functions.php
  *
  * @group misc
  * @group functions
  */
-class Misc_Functions_Tests extends WP_UnitTestCase {
+class Tests extends UnitTestCase {
 
 	/**
 	 * Amount.
@@ -26,7 +30,7 @@ class Misc_Functions_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_format_amount()
+	 * @covers ::affwp_format_amount()
 	 */
 	public function test_format_amount_floatval_remains_floatval_with_comma_thousands_seperator() {
 		affiliate_wp()->settings->set( array(
@@ -43,7 +47,7 @@ class Misc_Functions_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_currency()
+	 * @covers ::affwp_get_currency()
 	 */
 	public function test_get_currency_should_default_to_USD() {
 		$currency = affwp_get_currency();
@@ -52,7 +56,7 @@ class Misc_Functions_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_currency()
+	 * @covers ::affwp_get_currency()
 	 */
 	public function test_get_currency_modified_should_return_new_currency() {
 		$new = 'CZK';
@@ -65,7 +69,7 @@ class Misc_Functions_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_currency()
+	 * @covers ::affwp_get_currency()
 	 */
 	public function test_get_currency_filtered_should_return_filtered_currency() {
 		$currency = affwp_get_currency();
@@ -83,7 +87,7 @@ class Misc_Functions_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_decimal_count()
+	 * @covers ::affwp_get_decimal_count()
 	 */
 	public function test_get_decimal_count_default_should_be_2() {
 		$count = affwp_get_decimal_count();
@@ -92,7 +96,7 @@ class Misc_Functions_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_decimal_count()
+	 * @covers ::affwp_get_decimal_count()
 	 */
 	public function test_filtered_get_decimal_count_should_return_filtered() {
 		add_filter( 'affwp_decimal_count', function() {
@@ -106,7 +110,7 @@ class Misc_Functions_Tests extends WP_UnitTestCase {
 
 	/**
 	 * @dataProvider _make_url_human_readable_dp
-	 * @covers affwp_make_url_human_readable()
+	 * @covers ::affwp_make_url_human_readable()
 	 */
 	public function test_make_url_human_readable( $ugly, $human ) {
 		$this->assertEquals( $human, affwp_make_url_human_readable( $ugly ) );
@@ -133,14 +137,14 @@ class Misc_Functions_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_format_rate()
+	 * @covers ::affwp_format_rate()
 	 */
 	public function test_format_rate_should_format_percentage_as_percentage() {
 		$this->assertSame( '20%', affwp_format_rate( 0.2 ) );
 	}
 
 	/**
-	 * @covers affwp_format_rate()
+	 * @covers ::affwp_format_rate()
 	 */
 	public function test_format_rate_should_format_non_percentage_as_flat() {
 		$this->assertSame( '&#36;20', affwp_format_rate( 20, 'flat' ) );

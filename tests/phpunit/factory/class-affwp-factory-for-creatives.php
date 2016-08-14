@@ -1,15 +1,13 @@
 <?php
+namespace AffWP\Tests\Factory;
 
-class AffWP_Factory_For_Creatives extends WP_UnitTest_Factory_For_Thing {
+class Creative extends \WP_UnitTest_Factory_For_Thing {
 
 	function __construct( $factory = null ) {
 		parent::__construct( $factory );
 	}
 
 	function create_many( $count, $args = array(), $generation_definitions = null ) {
-		// Parent create_many() uses initial value of 1 and < $count.
-		$count = $count - 1;
-
 		return parent::create_many( $count, $args, $generation_definitions );
 	}
 

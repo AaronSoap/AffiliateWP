@@ -1,4 +1,8 @@
 <?php
+namespace AffWP\Tools;
+
+use AffWP\Tests\UnitTestCase;
+
 require_once( AFFILIATEWP_PLUGIN_DIR . 'includes/admin/tools/tools.php' );
 
 /**
@@ -6,17 +10,17 @@ require_once( AFFILIATEWP_PLUGIN_DIR . 'includes/admin/tools/tools.php' );
  *
  * @group tools
  */
-class Tools_Tests extends WP_UnitTestCase {
+class Tests extends UnitTestCase {
 
 	/**
-	 * @covers affwp_get_current_tools_tab()
+	 * @covers ::affwp_get_current_tools_tab()
 	 */
 	public function test_get_current_tools_tab_default_should_return_export_import() {
 		$this->assertSame( 'export_import', affwp_get_current_tools_tab() );
 	}
 
 	/**
-	 * @covers affwp_get_current_tools_tab()
+	 * @covers ::affwp_get_current_tools_tab()
 	 */
 	public function test_get_current_tools_tab_valid_GET_tab_value_should_return_value() {
 		$_GET['tab'] = 'recount';
@@ -25,7 +29,7 @@ class Tools_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers affwp_get_current_tools_tab()
+	 * @covers ::affwp_get_current_tools_tab()
 	 */
 	public function test_get_current_tools_tab_invalid_GET_tab_value_should_return_export_import() {
 		$_GET['tab'] = 'foobar';

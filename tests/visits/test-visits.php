@@ -1,6 +1,14 @@
 <?php
+namespace AffWP\Visit;
 
-class Visit_Tests extends WP_UnitTestCase {
+use AffWP\Tests\UnitTestCase;
+
+/**
+ * Visit tests
+ *
+ * @group visits
+ */
+class Visit_Tests extends UnitTestCase {
 
 	protected $domain;
 

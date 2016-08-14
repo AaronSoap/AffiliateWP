@@ -1,11 +1,15 @@
 <?php
+namespace AffWP\Tracking;
+
+use AffWP\Tests\UnitTestCase;
+
 /**
  * Tests for Affiliate_WP_Tracking.
  *
  * @covers Affiliate_WP_Tracking
  * @group tracking
  */
-class Tracking_Tests extends WP_UnitTestCase {
+class Tests extends UnitTestCase {
 
 	/**
 	 * @covers Affiliate_WP_Tracking::strip_referral_from_paged_urls()
