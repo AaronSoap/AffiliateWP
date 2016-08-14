@@ -1,14 +1,15 @@
 <?php
+namespace AffWP\Tests\Factory;
 
-class AffWP_Factory_For_Payouts extends WP_UnitTest_Factory_For_Thing {
+class Payout extends \WP_UnitTest_Factory_For_Thing {
 
 	function __construct( $factory = null ) {
 		parent::__construct( $factory );
 	}
 
 	function create_object( $args ) {
-		$affiliate = new AffWP_Factory_For_Affiliates();
-		$referral  = New AffWP_Factory_For_Referrals();
+		$affiliate = new Affiliate();
+		$referral  = New Referral();
 
 		// Only create the associated affiliate if one wasn't supplied.
 		if ( empty( $args['affiliate_id'] ) ) {

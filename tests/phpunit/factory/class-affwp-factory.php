@@ -19,6 +19,11 @@ class Factory extends \WP_UnitTest_Factory {
 	public $creative;
 
 	/**
+	 * @var \AffWP\Tests\Factory\Payout
+	 */
+	public $payout;
+
+	/**
 	 * @var \AffWP\Tests\Factory\Referral
 	 */
 	public $referral;
@@ -33,6 +38,7 @@ class Factory extends \WP_UnitTest_Factory {
 
 		$this->affiliate = new Factory\Affiliate( $this );
 		$this->creative  = new Factory\Creative( $this );
+		$this->payout    = new Factory\Payout( $this );
 		$this->referral  = new Factory\Referral( $this );
 		$this->visit     = new Factory\Visit( $this );
 	}
