@@ -114,6 +114,7 @@ class Affiliate_WP_DB_Affiliates extends Affiliate_WP_DB {
 	 *
 	 *     @type int       $number       Number of affiliates to query for. Default 20.
 	 *     @type int       $offset       Number of affiliates to offset the query for. Default 0.
+	 *     @type int|array $exclude      Affiliate ID or array of IDs to explicitly exclude.
 	 *     @type int|array $user_id      User ID or array of user IDs that correspond to the affiliate user.
 	 *     @type int|array $affiliate_id Affiliate ID or array of affiliate IDs to retrieve.
 	 *     @type string    $status       Affiliate status. Default empty.
@@ -132,6 +133,7 @@ class Affiliate_WP_DB_Affiliates extends Affiliate_WP_DB {
 		$defaults = array(
 			'number'       => 20,
 			'offset'       => 0,
+			'exclude'      => array(),
 			'user_id'      => 0,
 			'affiliate_id' => 0,
 			'status'       => '',
@@ -152,6 +154,18 @@ class Affiliate_WP_DB_Affiliates extends Affiliate_WP_DB {
 		}
 
 		$where = '';
+
+		if ( ! empty( $args['exclude'] ) ) {
+			$where .= empty( $where ) ? "WHERE " : "AND ";
+
+			if ( is_array( $args['exclude'] ) ) {
+				$exclude = array_map( 'intval', $args['exclude'] );
+			} else {
+				$exclude = intval( $args['exclude'] );
+			}
+
+			$where .= "`affiliate_id` NOT IN( {$exclude} )";
+		}
 
 		// affiliates for specific users
 		if ( ! empty( $args['user_id'] ) ) {

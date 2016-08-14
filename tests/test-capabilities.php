@@ -1,21 +1,36 @@
 <?php
+namespace AffWP\Capabilities;
 
-class Capabilities_Tests extends WP_UnitTestCase {
+use AffWP\Tests\UnitTestCase;
 
-	protected $_user_id;
+/**
+ * User capabilities tests.
+ *
+ * @covers Affiliate_WP_Capabilities
+ * @group capabilities
+ * @group users
+ */
+class Tests extends UnitTestCase {
 
 	/**
-	 * Set up.
+	 * User fixture.
+	 *
+	 * @access protected
+	 * @var int
+	 * @static
 	 */
-	public function setUp() {
-		parent::setUp();
+	protected static $user_id = 0;
 
-		$this->_user_id = $this->factory->user->create( array(
+	/**
+	 * Set up fixtures once.
+	 */
+	public static function wpSetUpBeforeClass() {
+		self::$user_id = parent::affwp()->user->create( array(
 			'role' => 'administrator'
 		) );
 
 		// Flush the $wp_roles global.
-		$this->_flush_roles();
+		parent::_flush_roles();
 	}
 
 	/**
@@ -23,10 +38,10 @@ class Capabilities_Tests extends WP_UnitTestCase {
 	 */
 	public function test_admin_has_caps() {
 
-		$roles = new Affiliate_WP_Capabilities;
+		$roles = new \Affiliate_WP_Capabilities;
 		$roles->add_caps();
 
-		$user = get_user_by( 'id', $this->_user_id );
+		$user = get_user_by( 'id', self::$user_id );
 
 		$this->assertTrue( $user->has_cap( 'view_affiliate_reports' ) );
 		$this->assertTrue( $user->has_cap( 'export_affiliate_data' ) );
@@ -37,21 +52,6 @@ class Capabilities_Tests extends WP_UnitTestCase {
 		$this->assertTrue( $user->has_cap( 'manage_visits' ) );
 		$this->assertTrue( $user->has_cap( 'manage_creatives' ) );
 
-	}
-
-	/**
-	 * Helper to flush the $wp_roles global.
-	 */
-	public function _flush_roles() {
-		/*
-		 * We want to make sure we're testing against the db, not just in-memory data
-		 * this will flush everything and reload it from the db
-		 */
-		unset( $GLOBALS['wp_user_roles'] );
-		global $wp_roles;
-		if ( is_object( $wp_roles ) ) {
-			$wp_roles->_init();
-		}
 	}
 
 }

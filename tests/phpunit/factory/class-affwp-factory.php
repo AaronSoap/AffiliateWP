@@ -1,42 +1,45 @@
 <?php
+namespace AffWP\Tests;
 
 /**
  * A factory for making WordPress data with a cross-object type API.
  *
  * Tests should use this factory to generate test fixtures.
  */
-class AffWP_Factory extends WP_UnitTest_Factory {
+class Factory extends \WP_UnitTest_Factory {
 
 	/**
-	 * @var AffWP_Factory_For_Affiliates
+	 * @var \AffWP\Tests\Factory\Affiliate
 	 */
 	public $affiliate;
 
 	/**
-	 * @var AffWP_Factory_For_Creatives
+	 * @var \AffWP\Tests\Factory\Creative
 	 */
 	public $creative;
 
 	/**
-	 * @var AffWP_Factory_For_Payouts
+	 * @var \AffWP\Tests\Factory\Payout
 	 */
 	public $payout;
 
 	/**
-	 * @var AffWP_Factory_For_Referrals
+	 * @var \AffWP\Tests\Factory\Referral
 	 */
 	public $referral;
 
 	/**
-	 * @var AffWP_Factory_For_Visits
+	 * @var \AffWP\Tests\Factory\Visit
 	 */
 	public $visit;
 
 	function __construct() {
-		$this->affiliate = new AffWP_Factory_For_Affiliates( $this );
-		$this->creative  = new AffWP_Factory_For_Creatives( $this );
-		$this->payout    = New AffWP_Factory_For_Payouts( $this );
-		$this->referral  = new AffWP_Factory_For_Referrals( $this );
-		$this->visit     = new AffWP_Factory_For_Visits( $this );
+		parent::__construct();
+
+		$this->affiliate = new Factory\Affiliate( $this );
+		$this->creative  = new Factory\Creative( $this );
+		$this->payout    = new Factory\Payout( $this );
+		$this->referral  = new Factory\Referral( $this );
+		$this->visit     = new Factory\Visit( $this );
 	}
 }

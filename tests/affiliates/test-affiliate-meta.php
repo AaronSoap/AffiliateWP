@@ -1,6 +1,17 @@
 <?php
+namespace AffWP\Affiliate\Meta;
 
-class Affiliate_Meta_Tests extends WP_UnitTestCase {
+use AffWP\Tests\UnitTestCase;
+
+/**
+ * Affiliate Meta tests
+ *
+ * @covers \Affiliate_WP_Affiliate_Meta_DB
+ * @group affiliates
+ * @group meta
+ * @group database
+ */
+class Tests extends UnitTestCase {
 
 	protected $_user_id = 1;
 	protected $_affiliate_id = 0;

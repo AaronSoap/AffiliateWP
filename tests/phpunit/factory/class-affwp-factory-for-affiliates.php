@@ -1,6 +1,7 @@
 <?php
+namespace AffWP\Tests\Factory;
 
-class AffWP_Factory_For_Affiliates extends WP_UnitTest_Factory_For_Thing {
+class Affiliate extends \WP_UnitTest_Factory_For_Thing {
 
 	function __construct( $factory = null ) {
 		parent::__construct( $factory );
@@ -19,7 +20,7 @@ class AffWP_Factory_For_Affiliates extends WP_UnitTest_Factory_For_Thing {
 	}
 
 	function create_object( $args ) {
-		$user = new WP_UnitTest_Factory_For_User();
+		$user = new \WP_UnitTest_Factory_For_User();
 
 		// Only create the associated user if one wasn't supplied.
 		if ( empty( $args['user_id'] ) ) {

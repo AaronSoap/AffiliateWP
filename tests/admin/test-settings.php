@@ -1,10 +1,14 @@
 <?php
+namespace AffWP\Settings;
+
+use AffWP\Tests\UnitTestCase;
+
 /**
  * Tests for Affiliate_WP_Settings
  *
  * @covers Affiliate_WP_Settings
  */
-class Afilliate_Settings_Tests extends WP_UnitTestCase {
+class Tests extends UnitTestCase {
 
 	/**
 	 * Settings instance.
@@ -20,7 +24,7 @@ class Afilliate_Settings_Tests extends WP_UnitTestCase {
 	public function setUp() {
 		parent::setUp();
 
-		$this->settings = new Affiliate_WP_Settings();
+		$this->settings = new \Affiliate_WP_Settings();
 
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/settings/display-settings.php';
 	}
@@ -66,7 +70,7 @@ class Afilliate_Settings_Tests extends WP_UnitTestCase {
 
 		// Define and reset $settings.
 		define( 'AFFILIATE_WP_DEBUG', true );
-		$this->settings = new Affiliate_WP_Settings();
+		$this->settings = new \Affiliate_WP_Settings();
 
 		// Constant should override the value.
 		$this->assertTrue( $this->settings->get( 'debug_mode' ) );

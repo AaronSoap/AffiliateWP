@@ -1,4 +1,7 @@
 <?php
+namespace AffWP\Payout\Object;
+
+use AffWP\Tests\UnitTestCase;
 use AffWP\Affiliate\Payout;
 
 /**
@@ -10,7 +13,7 @@ use AffWP\Affiliate\Payout;
  * @group payouts
  * @group objects
  */
-class AffWP_Affiliate_Payout_Tests extends AffiliateWP_UnitTestCase {
+class Tests extends UnitTestCase {
 
 	/**
 	 * @covers AffWP\Object::get_instance()
@@ -23,10 +26,13 @@ class AffWP_Affiliate_Payout_Tests extends AffiliateWP_UnitTestCase {
 	 * @covers AffWP\Object::get_instance()
 	 */
 	public function test_get_instance_with_payout_id_should_return_Payout_object() {
-		$payout_id = $this->affwp->payout->create();
+		$payout_id = $this->factory->payout->create();
 
 		$payout = Payout::get_instance( $payout_id );
 
 		$this->assertInstanceOf( 'AffWP\Affiliate\Payout', $payout );
+
+		// Clean up.
+		affwp_delete_payout( $payout_id );
 	}
 }
